@@ -64,7 +64,7 @@ go mod tidy
 ```golang
 import "github.com/auth0-lab/fga-go-sdk"
 
-configuration, err := NewConfiguration(UserConfiguration{
+configuration, err := auth0fga.NewConfiguration(auth0fga.UserConfiguration{
     StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
     ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
     ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
@@ -75,7 +75,7 @@ if err != nil {
     // .. Handle error
 }
 
-apiClient := NewAPIClient(configuration)
+apiClient := auth0fga.NewAPIClient(configuration)
 ```
 
 ### Getting your Store ID, Client ID and Client Secret
@@ -107,17 +107,17 @@ In the playground environment, you do not need to provide a client id and client
 > Note: The Auth0 FGA Playground, Dashboard and Documentation use a friendly syntax which gets translated to the API syntax seen below. Learn more about [the Auth0 FGA configuration language](https://docs.fga.dev/modeling/configuration-language).
 
 ```golang
-body  := auth0Fga.AuthorizationmodelTypeDefinitions{TypeDefinitions: &[]AuthorizationmodelTypeDefinition{
+body  := auth0fga.AuthorizationmodelTypeDefinitions{TypeDefinitions: &[]auth0fga.AuthorizationmodelTypeDefinition{
 	{
 		Type: "repo",
-		Relations: &map[string]auth0Fga.AuthorizationmodelUserset{
+		Relations: map[string]auth0fga.AuthorizationmodelUserset{
 			"writer": {This: &map[string]interface{}{}},
-			"reader": {Union: &auth0Fga.AuthorizationmodelUsersets{
-				Child: &[]auth0Fga.AuthorizationmodelUserset{
+			"reader": {Union: &auth0fga.AuthorizationmodelUsersets{
+				Child: &[]auth0fga.AuthorizationmodelUserset{
 					{This: &map[string]interface{}{}},
-					{ComputedUserset: &auth0Fga.AuthorizationmodelObjectRelation{
-						Object:   auth0Fga.PtrString(""),
-						Relation: auth0Fga.PtrString("writer"),
+					{ComputedUserset: &auth0fga.AuthorizationmodelObjectRelation{
+						Object:   auth0fga.PtrString(""),
+						Relation: auth0fga.PtrString("writer"),
 					}},
 				},
 			}},
@@ -126,9 +126,7 @@ body  := auth0Fga.AuthorizationmodelTypeDefinitions{TypeDefinitions: &[]Authoriz
 }}
 data, response, err := apiClient.Auth0FgaApi.WriteAuthorizationModel(context.Background()).Body(body).Execute()
 
-// data = {"id":"1uHxCSuTP0VKPYSnkq1pbb1jeZw"} // JSON
-
-fmt.Printf("%s", *data.AuthorizationModelId) // 1uHxCSuTP0VKPYSnkq1pbb1jeZw
+fmt.Printf("%s", data.AuthorizationModelId) // 1uHxCSuTP0VKPYSnkq1pbb1jeZw
 ```
 
 #### Read a Single Authorization Model
@@ -139,7 +137,7 @@ data, response, err := apiClient.Auth0FgaApi.ReadAuthorizationModel(context.Back
 
 // data = {"authorization_model":{"id":"1uHxCSuTP0VKPYSnkq1pbb1jeZw","type_definitions":[{"type":"repo","relations":{"writer":{"this":{}},"reader":{ ... }}}]}} // JSON
 
-fmt.Printf("%s", *(*data.AuthorizationModel).Id) // 1uHxCSuTP0VKPYSnkq1pbb1jeZw
+fmt.Printf("%s", data.AuthorizationModel.Id) // 1uHxCSuTP0VKPYSnkq1pbb1jeZw
 ```
 
 #### Read Authorization Model IDs
@@ -149,18 +147,18 @@ data, response, err := apiClient.Auth0FgaApi.ReadAuthorizationModels(context.Bac
 
 // data = {"authorization_model_ids":["1uHxCSuTP0VKPYSnkq1pbb1jeZw","GtQpMohWezFmIbyXxVEocOCxxgq"]} // in JSON
 
-fmt.Printf("%s", *(*data.AuthorizationModelIds)[0]) // 1uHxCSuTP0VKPYSnkq1pbb1jeZw
+fmt.Printf("%s", (*data.AuthorizationModelIds)[0]) // 1uHxCSuTP0VKPYSnkq1pbb1jeZw
 ```
 
 #### Check
 > Provide a tuple and ask the Auth0 FGA API to check for a relationship
 
 ```golang
-body := auth0Fga.Auth0FgaCheckRequestParams{
-	TupleKey: &Auth0FgaTupleKey{
-		User: auth0Fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
-		Relation: auth0Fga.PtrString("admin"),
-		Object: auth0Fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+body := auth0fga.Auth0FgaCheckRequestParams{
+	TupleKey: &auth0fga.Auth0FgaTupleKey{
+		User: auth0fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
+		Relation: auth0fga.PtrString("admin"),
+		Object: auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
 	},
 }
 data, response, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(body).Execute()
@@ -174,13 +172,13 @@ fmt.Printf("%t", *data.Allowed) // True
 #### Write Tuples
 
 ```golang
-body := auth0Fga.Auth0FgaWriteRequestParams{
-	Writes: &auth0Fga.Auth0FgaTupleKeys{
-		TupleKeys: &[]auth0Fga.Auth0FgaTupleKey{
+body := auth0fga.Auth0FgaWriteRequestParams{
+	Writes: &auth0fga.Auth0FgaTupleKeys{
+		TupleKeys: []auth0fga.Auth0FgaTupleKey{
 			{
-				User: auth0Fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
-				Relation: auth0Fga.PtrString("admin"),
-				Object: auth0Fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+				User: auth0fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
+				Relation: autauth0fgah0Fga.PtrString("admin"),
+				Object: auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
 			},
 		},
 	},
@@ -192,13 +190,13 @@ _, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(body)
 #### Delete Tuples
 
 ```golang
-body := auth0Fga.Auth0FgaWriteRequestParams{
-	Deletes: &auth0Fga.Auth0FgaTupleKeys{
-		TupleKeys: &[]auth0Fga.Auth0FgaTupleKey{
+body := auth0fga.Auth0FgaWriteRequestParams{
+	Deletes: &auth0fga.Auth0FgaTupleKeys{
+		TupleKeys: []auth0fga.Auth0FgaTupleKey{
 			{
-				User: auth0Fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
-				Relation: auth0Fga.PtrString("admin"),
-				Object: auth0Fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+				User: auth0fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
+				Relation: auth0fga.PtrString("admin"),
+				Object: auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
 			},
 		},
 	},
@@ -210,10 +208,10 @@ _, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(body)
 #### Expand
 
 ```golang
-body := auth0Fga.Auth0FgaExpandRequestParams{
-	TupleKey: &auth0Fga.Auth0FgaTupleKey{
-		Relation: auth0Fga.PtrString("admin"),
-		Object: auth0Fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+body := auth0fga.Auth0FgaExpandRequestParams{
+	TupleKey: &auth0fga.Auth0FgaTupleKey{
+		Relation: auth0fga.PtrString("admin"),
+		Object: auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
 	},
 }
 data, response, err := apiClient.Auth0FgaApi.Expand(context.Background()).Body(body).Execute()
@@ -225,35 +223,35 @@ data, response, err := apiClient.Auth0FgaApi.Expand(context.Background()).Body(b
 
 ```golang
 // Find if a relationship tuple stating that a certain user is an admin on a certain workspace
-body := auth0Fga.Auth0FgaReadRequestParams{
-    TupleKey: &auth0Fga.Auth0FgaTupleKey{
-        User:     auth0Fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
-        Relation: auth0Fga.PtrString("admin"),
-        Object:   auth0Fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+body := auth0fga.Auth0FgaReadRequestParams{
+    TupleKey: &auth0fga.Auth0FgaTupleKey{
+        User:     auth0fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
+        Relation: auth0fga.PtrString("admin"),
+        Object:   auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
     },
 }
 
 // Find all relationship tuples where a certain user has a relationship as any relation to a certain workspace
-body := auth0Fga.Auth0FgaReadRequestParams{
-    TupleKey: &auth0Fga.Auth0FgaTupleKey{
-        User:     auth0Fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
-        Object:   auth0Fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+body := auth0fga.Auth0FgaReadRequestParams{
+    TupleKey: &auth0fga.Auth0FgaTupleKey{
+        User:     auth0fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
+        Object:   auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
     },
 }
 
 // Find all relationship tuples where a certain user is an admin on any workspace
-body := auth0Fga.Auth0FgaReadRequestParams{
-    TupleKey: &auth0Fga.Auth0FgaTupleKey{
-        User:     auth0Fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
-        Relation: auth0Fga.PtrString("admin"),
-        Object:   auth0Fga.PtrString("workspace:"),
+body := auth0fga.Auth0FgaReadRequestParams{
+    TupleKey: &auth0fga.Auth0FgaTupleKey{
+        User:     auth0fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
+        Relation: auth0fga.PtrString("admin"),
+        Object:   auth0fga.PtrString("workspace:"),
     },
 }
 
 // Find all relationship tuples where any user has a relationship as any relation with a particular workspace
-body := auth0Fga.Auth0FgaReadRequestParams{
-    TupleKey: &auth0Fga.Auth0FgaTupleKey{
-        Object:   auth0Fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+body := auth0fga.Auth0FgaReadRequestParams{
+    TupleKey: &auth0fga.Auth0FgaTupleKey{
+        Object:   auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
     },
 }
 
