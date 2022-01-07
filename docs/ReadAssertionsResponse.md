@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AuthorizationModelId** | Pointer to **string** | The authorization model ID | [optional] 
+**AuthorizationModelId** | Pointer to **string** |  | [optional] 
 **Assertions** | Pointer to [**[]Assertion**](Assertion.md) |  | [optional] 
 
 ## Methods

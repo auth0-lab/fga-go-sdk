@@ -24,6 +24,8 @@ _testmain.go
 *.prof
 
 git_push.sh
+.DS_Store
+VERSION.txt
 
 # IDEs
 .idea

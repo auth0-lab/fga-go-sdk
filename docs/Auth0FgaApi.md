@@ -42,7 +42,7 @@ import (
 
 func main() {
     
-    body := *auth0fga.NewCheckRequestParams() // CheckRequestParams | 
+    body := *openapiclient.NewCheckRequestParams() // CheckRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -196,7 +196,7 @@ import (
 
 func main() {
     
-    body := *auth0fga.NewExpandRequestParams() // ExpandRequestParams | 
+    body := *openapiclient.NewExpandRequestParams() // ExpandRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -273,7 +273,7 @@ import (
 
 func main() {
     
-    body := *auth0fga.NewReadRequestParams() // ReadRequestParams | 
+    body := *openapiclient.NewReadRequestParams() // ReadRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -350,7 +350,7 @@ import (
 
 func main() {
     
-    authorizationModelId := "authorizationModelId_example" // string | The authorization model ID
+    authorizationModelId := "authorizationModelId_example" // string | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -377,7 +377,7 @@ func main() {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**authorizationModelId** | **string** | The authorization model ID | 
+**authorizationModelId** | **string** |  | 
 
 ### Other Parameters
 
@@ -427,7 +427,7 @@ import (
 
 func main() {
     
-    id := "id_example" // string | The authorization model ID
+    id := "id_example" // string | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -454,7 +454,7 @@ func main() {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The authorization model ID | 
+**id** | **string** |  | 
 
 ### Other Parameters
 
@@ -658,7 +658,7 @@ import (
 
 func main() {
     
-    body := *auth0fga.NewWriteRequestParams() // WriteRequestParams | 
+    body := *openapiclient.NewWriteRequestParams() // WriteRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -735,8 +735,8 @@ import (
 
 func main() {
     
-    authorizationModelId := "authorizationModelId_example" // string | The authorization model ID
-    body := *auth0fga.NewWriteAssertionsRequestParams([]auth0fga.Assertion{*auth0fga.NewAssertion(*auth0fga.NewTupleKey(), false)}) // WriteAssertionsRequestParams | 
+    authorizationModelId := "authorizationModelId_example" // string | 
+    body := *openapiclient.NewWriteAssertionsRequestParams([]openapiclient.Assertion{*openapiclient.NewAssertion(*openapiclient.NewTupleKey(), false)}) // WriteAssertionsRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -763,7 +763,7 @@ func main() {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**authorizationModelId** | **string** | The authorization model ID | 
+**authorizationModelId** | **string** |  | 
 
 ### Other Parameters
 
@@ -814,7 +814,7 @@ import (
 
 func main() {
     
-    body := *auth0fga.NewTypeDefinitions() // TypeDefinitions | 
+    body := *openapiclient.NewTypeDefinitions() // TypeDefinitions | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -891,7 +891,7 @@ import (
 
 func main() {
     
-    body := *auth0fga.NewWriteSettingsRequestParams() // WriteSettingsRequestParams | 
+    body := *openapiclient.NewWriteSettingsRequestParams() // WriteSettingsRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -968,7 +968,7 @@ import (
 
 func main() {
     
-    body := *auth0fga.NewWriteTokenIssuersRequestParams() // WriteTokenIssuersRequestParams | 
+    body := *openapiclient.NewWriteTokenIssuersRequestParams() // WriteTokenIssuersRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),

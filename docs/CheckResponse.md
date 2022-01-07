@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Allowed** | Pointer to **bool** |  | [optional] 
-**Resolution** | Pointer to **string** |  | [optional] 
+**Resolution** | Pointer to **string** | For internal use only. | [optional] 
 
 ## Methods
 

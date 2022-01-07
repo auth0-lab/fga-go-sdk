@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **TupleKey** | Pointer to [**TupleKey**](TupleKey.md) |  | [optional] 
 **AuthorizationModelId** | Pointer to **string** |  | [optional] 
-**Trace** | Pointer to **bool** | defaults to false. making it true has performance implications. only use for debugging purposes, etc. | [optional] [readonly] 
+**Trace** | Pointer to **bool** | Defaults to false. Making it true has performance implications. | [optional] [readonly] 
 
 ## Methods
 

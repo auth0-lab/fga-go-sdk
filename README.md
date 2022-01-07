@@ -108,10 +108,6 @@ Make sure you have created your credentials on the Auth0 FGA Dashboard. [Learn h
 
 You will need to set the `AUTH0_FGA_ENVIRONMENT` variable to `"us"`. Provide the store id, client id and client secret you have created on the Dashboard.
 
-#### PoC
-
-If you are an Auth0 FGA PoC participant, you need to set the `AUTH0_FGA_ENVIRONMENT` variable to `"poc"`. Provide the store id, client id and client secret you have received from us.
-
 #### Playground
 
 If you are testing this on the public playground, you need to set your `AUTH0_FGA_ENVIRONMENT` to `"playground"`.

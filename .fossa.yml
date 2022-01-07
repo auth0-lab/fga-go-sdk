@@ -5,10 +5,10 @@ version: 2
 cli:
   server: https://app.fossa.com
   fetcher: custom
-  project: git@github.com:auth0-lab/auth0-fga-go-sdk.git
+  project: git@github.com:auth0-lab/fga-go-sdk.git
 analyze:
   modules:
     - name: auth0-fga-go-sdk
       type: go
-      target: github.com/auth0-lab/auth0-fga-go-sdk
+      target: github.com/auth0-lab/fga-go-sdk
       path: .
