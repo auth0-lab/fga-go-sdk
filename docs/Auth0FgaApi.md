@@ -57,6 +57,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Check``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `Check`: CheckResponse
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.Check`: %v\n", resp)
@@ -134,6 +146,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.DeleteTokenIssuer``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `DeleteTokenIssuer`: map[string]interface{}
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.DeleteTokenIssuer`: %v\n", resp)
@@ -211,6 +235,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Expand``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `Expand`: ExpandResponse
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.Expand`: %v\n", resp)
@@ -288,6 +324,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Read``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `Read`: ReadResponse
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.Read`: %v\n", resp)
@@ -365,6 +413,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ReadAssertions``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `ReadAssertions`: ReadAssertionsResponse
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.ReadAssertions`: %v\n", resp)
@@ -442,6 +502,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ReadAuthorizationModel``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `ReadAuthorizationModel`: ReadAuthorizationModelResponse
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.ReadAuthorizationModel`: %v\n", resp)
@@ -520,6 +592,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ReadAuthorizationModels``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `ReadAuthorizationModels`: ReadAuthorizationModelsResponse
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.ReadAuthorizationModels`: %v\n", resp)
@@ -597,6 +681,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ReadSettings``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `ReadSettings`: Settings
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.ReadSettings`: %v\n", resp)
@@ -673,6 +769,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Write``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `Write`: map[string]interface{}
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.Write`: %v\n", resp)
@@ -751,6 +859,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteAssertions``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `WriteAssertions`: map[string]interface{}
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.WriteAssertions`: %v\n", resp)
@@ -829,6 +949,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteAuthorizationModel``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `WriteAuthorizationModel`: WriteAuthorizationModelResponse
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.WriteAuthorizationModel`: %v\n", resp)
@@ -906,6 +1038,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteSettings``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `WriteSettings`: Settings
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.WriteSettings`: %v\n", resp)
@@ -983,6 +1127,18 @@ func main() {
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteTokenIssuer``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
     }
     // response from `WriteTokenIssuer`: TokenIssuer
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.WriteTokenIssuer`: %v\n", resp)

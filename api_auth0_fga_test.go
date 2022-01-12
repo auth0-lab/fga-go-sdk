@@ -655,4 +655,186 @@ func TestAuth0FgaApi(t *testing.T) {
 			return
 		}
 	})
+
+	t.Run("Check with 400 error", func(t *testing.T) {
+		test := TestDefinition{
+			Name:           "Check",
+			JsonResponse:   `{"allowed":true, "resolution":""}`,
+			ResponseStatus: 400,
+			Method:         "POST",
+			RequestPath:    "check",
+		}
+		requestBody := CheckRequestParams{
+			TupleKey: &TupleKey{
+				User:     PtrString("anne@auth0.com"),
+				Relation: PtrString("repo_reader"),
+				Object:   PtrString("github-repo:auth0/express-jwt"),
+			},
+		}
+
+		var expectedResponse CheckResponse
+		if err := json.Unmarshal([]byte(test.JsonResponse), &expectedResponse); err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+			func(req *http.Request) (*http.Response, error) {
+				return httpmock.NewStringResponse(400, ""), nil
+			},
+		)
+		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		if err == nil {
+			t.Errorf("Expected error with 400 request but there is none")
+			return
+		}
+		validationError, ok := err.(Auth0FgaApiValidationError)
+		if !ok {
+			t.Errorf("Expected validation Error but type is incorrect %v", err)
+			return
+		}
+		// Do some basic validation of the error itself
+
+		if validationError.StoreId() != configuration.StoreId {
+			t.Errorf("Expected store id to be %s but actual %s", configuration.StoreId, validationError.StoreId())
+			return
+		}
+
+		if validationError.EndpointCategory() != "Check" {
+			t.Errorf("Expected category to be Check but actual %s", validationError.EndpointCategory())
+			return
+		}
+
+		if validationError.RequestMethod() != "POST" {
+			t.Errorf("Expected category to be POST but actual %s", validationError.RequestMethod())
+			return
+		}
+
+		if validationError.ResponseStatusCode() != 400 {
+			t.Errorf("Expected status code to be 400 but actual %d", validationError.ResponseStatusCode())
+			return
+		}
+	})
+
+	t.Run("Check with 401 error", func(t *testing.T) {
+		test := TestDefinition{
+			Name:           "Check",
+			JsonResponse:   `{"allowed":true, "resolution":""}`,
+			ResponseStatus: 401,
+			Method:         "POST",
+			RequestPath:    "check",
+		}
+		requestBody := CheckRequestParams{
+			TupleKey: &TupleKey{
+				User:     PtrString("anne@auth0.com"),
+				Relation: PtrString("repo_reader"),
+				Object:   PtrString("github-repo:auth0/express-jwt"),
+			},
+		}
+
+		var expectedResponse CheckResponse
+		if err := json.Unmarshal([]byte(test.JsonResponse), &expectedResponse); err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+			func(req *http.Request) (*http.Response, error) {
+				return httpmock.NewStringResponse(401, ""), nil
+			},
+		)
+		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		if err == nil {
+			t.Errorf("Expected error with 401 request but there is none")
+			return
+		}
+		authenticationError, ok := err.(Auth0FgaApiAuthenticationError)
+		if !ok {
+			t.Errorf("Expected authentication Error but type is incorrect %v", err)
+			return
+		}
+		// Do some basic validation of the error itself
+
+		if authenticationError.StoreId() != configuration.StoreId {
+			t.Errorf("Expected store id to be %s but actual %s", configuration.StoreId, authenticationError.StoreId())
+			return
+		}
+
+		if authenticationError.EndpointCategory() != "Check" {
+			t.Errorf("Expected category to be Check but actual %s", authenticationError.EndpointCategory())
+			return
+		}
+
+		if authenticationError.ResponseStatusCode() != 401 {
+			t.Errorf("Expected status code to be 401 but actual %d", authenticationError.ResponseStatusCode())
+			return
+		}
+
+	})
+
+	t.Run("Check with 500 error", func(t *testing.T) {
+		test := TestDefinition{
+			Name:           "Check",
+			JsonResponse:   `{"allowed":true, "resolution":""}`,
+			ResponseStatus: 500,
+			Method:         "POST",
+			RequestPath:    "check",
+		}
+		requestBody := CheckRequestParams{
+			TupleKey: &TupleKey{
+				User:     PtrString("anne@auth0.com"),
+				Relation: PtrString("repo_reader"),
+				Object:   PtrString("github-repo:auth0/express-jwt"),
+			},
+		}
+
+		var expectedResponse CheckResponse
+		if err := json.Unmarshal([]byte(test.JsonResponse), &expectedResponse); err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+			func(req *http.Request) (*http.Response, error) {
+				return httpmock.NewStringResponse(500, ""), nil
+			},
+		)
+		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		if err == nil {
+			t.Errorf("Expected error with 500 request but there is none")
+			return
+		}
+		internalError, ok := err.(Auth0FgaApiInternalError)
+		if !ok {
+			t.Errorf("Expected internal Error but type is incorrect %v", err)
+			return
+		}
+		// Do some basic validation of the error itself
+
+		if internalError.StoreId() != configuration.StoreId {
+			t.Errorf("Expected store id to be %s but actual %s", configuration.StoreId, internalError.StoreId())
+			return
+		}
+
+		if internalError.EndpointCategory() != "Check" {
+			t.Errorf("Expected category to be Check but actual %s", internalError.EndpointCategory())
+			return
+		}
+
+		if internalError.RequestMethod() != "POST" {
+			t.Errorf("Expected category to be POST but actual %s", internalError.RequestMethod())
+			return
+		}
+
+		if internalError.ResponseStatusCode() != 500 {
+			t.Errorf("Expected status code to be 500 but actual %d", internalError.ResponseStatusCode())
+			return
+		}
+	})
 }

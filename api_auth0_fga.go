@@ -19,6 +19,7 @@ import (
 	_ioutil "io/ioutil"
 	_nethttp "net/http"
 	_neturl "net/url"
+	_strconv "strconv"
 	"strings"
 )
 
@@ -578,6 +579,19 @@ type Auth0FgaApi interface {
 // Auth0FgaApiService Auth0FgaApi service
 type Auth0FgaApiService service
 
+func getMaximumRateUnit(api string) string {
+	switch api {
+	case "Check":
+		return "second"
+	case "Read":
+		return "second"
+	case "Write":
+		return "second"
+	default:
+		return "minute"
+	}
+}
+
 type ApiCheckRequest struct {
 	ctx        _context.Context
 	ApiService Auth0FgaApi
@@ -685,67 +699,127 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Check",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "Check validation error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Check",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Check authentication error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Check",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Check rate limit error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("Check")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Check",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Check internal error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "Check",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "Check error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -847,67 +921,127 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "DeleteTokenIssuer",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "DeleteTokenIssuer validation error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "DeleteTokenIssuer",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "DeleteTokenIssuer authentication error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "DeleteTokenIssuer",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "DeleteTokenIssuer rate limit error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("DeleteTokenIssuer")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "DeleteTokenIssuer",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "DeleteTokenIssuer internal error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "DeleteTokenIssuer",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "DeleteTokenIssuer error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -1069,67 +1203,127 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Expand",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "Expand validation error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Expand",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Expand authentication error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Expand",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Expand rate limit error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("Expand")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Expand",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Expand internal error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "Expand",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "Expand error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -1329,67 +1523,127 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Read",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "Read validation error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Read",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Read authentication error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Read",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Read rate limit error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("Read")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Read",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Read internal error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "Read",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "Read error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -1488,67 +1742,127 @@ func (a *Auth0FgaApiService) ReadAssertionsExecute(r ApiReadAssertionsRequest) (
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAssertions",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "ReadAssertions validation error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAssertions",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadAssertions authentication error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAssertions",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadAssertions rate limit error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("ReadAssertions")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAssertions",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadAssertions internal error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "ReadAssertions",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "ReadAssertions error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -1687,67 +2001,127 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelExecute(r ApiReadAuthorizatio
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAuthorizationModel",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "ReadAuthorizationModel validation error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAuthorizationModel",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadAuthorizationModel authentication error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAuthorizationModel",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadAuthorizationModel rate limit error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("ReadAuthorizationModel")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAuthorizationModel",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadAuthorizationModel internal error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "ReadAuthorizationModel",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "ReadAuthorizationModel error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -1886,67 +2260,127 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAuthorizationModels",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "ReadAuthorizationModels validation error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAuthorizationModels",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadAuthorizationModels authentication error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAuthorizationModels",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadAuthorizationModels rate limit error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("ReadAuthorizationModels")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadAuthorizationModels",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadAuthorizationModels internal error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "ReadAuthorizationModels",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "ReadAuthorizationModels error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -2055,67 +2489,127 @@ func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Sett
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadSettings",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "ReadSettings validation error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadSettings",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadSettings authentication error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadSettings",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadSettings rate limit error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("ReadSettings")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadSettings",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadSettings internal error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "ReadSettings",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "ReadSettings error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -2258,67 +2752,127 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Write",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "Write validation error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Write",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Write authentication error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Write",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Write rate limit error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("Write")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "Write",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "Write internal error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "Write",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "Write error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -2428,67 +2982,127 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteAssertions",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "WriteAssertions validation error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteAssertions",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteAssertions authentication error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteAssertions",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteAssertions rate limit error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("WriteAssertions")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteAssertions",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteAssertions internal error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "WriteAssertions",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "WriteAssertions error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -2640,67 +3254,127 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteAuthorizationModel",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "WriteAuthorizationModel validation error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteAuthorizationModel",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteAuthorizationModel authentication error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteAuthorizationModel",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteAuthorizationModel rate limit error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("WriteAuthorizationModel")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteAuthorizationModel",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteAuthorizationModel internal error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "WriteAuthorizationModel",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "WriteAuthorizationModel error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -2815,67 +3489,127 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Se
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteSettings",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "WriteSettings validation error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteSettings",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteSettings authentication error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteSettings",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteSettings rate limit error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("WriteSettings")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteSettings",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteSettings internal error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "WriteSettings",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "WriteSettings error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
@@ -2996,67 +3730,127 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
+
+		if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+			newErr := Auth0FgaApiValidationError{
+				body:               localVarBody,
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteTokenIssuer",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+
+			newErr.error = "WriteTokenIssuer validation error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+
 		if localVarHTTPResponse.StatusCode == 401 {
+			newErr := Auth0FgaApiAuthenticationError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteTokenIssuer",
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteTokenIssuer authentication error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Status
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
+
 		if localVarHTTPResponse.StatusCode == 429 {
+			newErr := Auth0FgaApiRateLimitError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteTokenIssuer",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteTokenIssuer rate limit error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
+
+			// Due to CanonicalHeaderKey, header name is case-insensitive.
+			newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+			newErr.rateUnit = getMaximumRateUnit("WriteTokenIssuer")
+			newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		if localVarHTTPResponse.StatusCode == 500 {
+
+		if localVarHTTPResponse.StatusCode >= 500 {
+			newErr := Auth0FgaApiInternalError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "WriteTokenIssuer",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "WriteTokenIssuer internal error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
+
 			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
-				newErr.error = err.Error()
+				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
+			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr := Auth0FgaApiError{
+			body: localVarBody,
+
+			storeId:            a.client.cfg.StoreId,
+			endpointCategory:   "WriteTokenIssuer",
+			requestBody:        localVarPostBody,
+			requestMethod:      localVarHTTPMethod,
+			responseStatusCode: localVarHTTPResponse.StatusCode,
+			responseHeader:     localVarHTTPResponse.Header,
+		}
+		newErr.error = "WriteTokenIssuer error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
+
 		var v Status
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
-			newErr.error = err.Error()
+			newErr.modelDecodeError = err
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 

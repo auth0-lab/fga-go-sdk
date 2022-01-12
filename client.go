@@ -524,3 +524,339 @@ func (e GenericOpenAPIError) Body() []byte {
 func (e GenericOpenAPIError) Model() interface{} {
 	return e.model
 }
+
+// Auth0FgaApiAuthenticationError is raised when API has errors due to invalid authentication
+type Auth0FgaApiAuthenticationError struct {
+	body  []byte
+	error string
+	model interface{}
+
+	storeId            string
+	endpointCategory   string
+	modelDecodeError   error
+	responseStatusCode int
+	responseHeader     http.Header
+}
+
+// Error returns non-empty string if there was an error.
+func (e Auth0FgaApiAuthenticationError) Error() string {
+	return e.error
+}
+
+// Body returns the raw bytes of the response
+func (e Auth0FgaApiAuthenticationError) Body() []byte {
+	return e.body
+}
+
+// Model returns the unpacked model of the error
+func (e Auth0FgaApiAuthenticationError) Model() interface{} {
+	return e.model
+}
+
+// StoreId returns the store ID for the API that causes the error
+func (e Auth0FgaApiAuthenticationError) StoreId() string {
+	return e.storeId
+}
+
+// EndpointCategory returns the original API category
+func (e Auth0FgaApiAuthenticationError) EndpointCategory() string {
+	return e.endpointCategory
+}
+
+// ModelDecodeError returns any error when decoding the unpacked model of the error
+func (e Auth0FgaApiAuthenticationError) ModelDecodeError() error {
+	return e.modelDecodeError
+}
+
+// ResponseStatusCode returns the original API response status code
+func (e Auth0FgaApiAuthenticationError) ResponseStatusCode() int {
+	return e.responseStatusCode
+}
+
+// ResponseHeader returns the original API response header
+func (e Auth0FgaApiAuthenticationError) ResponseHeader() http.Header {
+	return e.responseHeader
+}
+
+// Auth0FgaApiError will be returned if there are errors in the API
+
+type Auth0FgaApiError struct {
+	body  []byte
+	error string
+	model interface{}
+
+	storeId            string
+	endpointCategory   string
+	requestBody        interface{}
+	requestMethod      string
+	modelDecodeError   error
+	responseStatusCode int
+	responseHeader     http.Header
+}
+
+// Error returns non-empty string if there was an error.
+func (e Auth0FgaApiError) Error() string {
+	return e.error
+}
+
+// Body returns the raw bytes of the response
+func (e Auth0FgaApiError) Body() []byte {
+	return e.body
+}
+
+// Model returns the unpacked model of the error
+func (e Auth0FgaApiError) Model() interface{} {
+	return e.model
+}
+
+// StoreId returns the store ID for the API that causes the error
+func (e Auth0FgaApiError) StoreId() string {
+	return e.storeId
+}
+
+// RequestBody returns the original request body
+func (e Auth0FgaApiError) RequestBody() interface{} {
+	return e.requestBody
+}
+
+// RequestMethod returns the method calling the API
+func (e Auth0FgaApiError) RequestMethod() string {
+	return e.requestMethod
+}
+
+// EndpointCategory returns the original API category
+func (e Auth0FgaApiError) EndpointCategory() string {
+	return e.endpointCategory
+}
+
+// ModelDecodeError returns any error when decoding the unpacked model of the error
+func (e Auth0FgaApiError) ModelDecodeError() error {
+	return e.modelDecodeError
+}
+
+// ResponseStatusCode returns the original API response status code
+func (e Auth0FgaApiError) ResponseStatusCode() int {
+	return e.responseStatusCode
+}
+
+// ResponseHeader returns the original API response header
+func (e Auth0FgaApiError) ResponseHeader() http.Header {
+	return e.responseHeader
+}
+
+// Auth0FgaApiValidationError will be returned if there are errors in the API's parameters
+
+type Auth0FgaApiValidationError struct {
+	body  []byte
+	error string
+	model interface{}
+
+	storeId            string
+	endpointCategory   string
+	requestBody        interface{}
+	requestMethod      string
+	modelDecodeError   error
+	responseStatusCode int
+	responseHeader     http.Header
+}
+
+// Error returns non-empty string if there was an error.
+func (e Auth0FgaApiValidationError) Error() string {
+	return e.error
+}
+
+// Body returns the raw bytes of the response
+func (e Auth0FgaApiValidationError) Body() []byte {
+	return e.body
+}
+
+// Model returns the unpacked model of the error
+func (e Auth0FgaApiValidationError) Model() interface{} {
+	return e.model
+}
+
+// StoreId returns the store ID for the API that causes the error
+func (e Auth0FgaApiValidationError) StoreId() string {
+	return e.storeId
+}
+
+// RequestBody returns the original request body
+func (e Auth0FgaApiValidationError) RequestBody() interface{} {
+	return e.requestBody
+}
+
+// RequestMethod returns the method calling the API
+func (e Auth0FgaApiValidationError) RequestMethod() string {
+	return e.requestMethod
+}
+
+// EndpointCategory returns the original API category
+func (e Auth0FgaApiValidationError) EndpointCategory() string {
+	return e.endpointCategory
+}
+
+// ModelDecodeError returns any error when decoding the unpacked model of the error
+func (e Auth0FgaApiValidationError) ModelDecodeError() error {
+	return e.modelDecodeError
+}
+
+// ResponseStatusCode returns the original API response status code
+func (e Auth0FgaApiValidationError) ResponseStatusCode() int {
+	return e.responseStatusCode
+}
+
+// ResponseHeader returns the original API response header
+func (e Auth0FgaApiValidationError) ResponseHeader() http.Header {
+	return e.responseHeader
+}
+
+// Auth0FgaApiInternalError will be returned if there are internal errors in the Auth0 FGA
+
+type Auth0FgaApiInternalError struct {
+	body  []byte
+	error string
+	model interface{}
+
+	storeId            string
+	endpointCategory   string
+	requestBody        interface{}
+	requestMethod      string
+	modelDecodeError   error
+	responseStatusCode int
+	responseHeader     http.Header
+}
+
+// Error returns non-empty string if there was an error.
+func (e Auth0FgaApiInternalError) Error() string {
+	return e.error
+}
+
+// Body returns the raw bytes of the response
+func (e Auth0FgaApiInternalError) Body() []byte {
+	return e.body
+}
+
+// Model returns the unpacked model of the error
+func (e Auth0FgaApiInternalError) Model() interface{} {
+	return e.model
+}
+
+// StoreId returns the store ID for the API that causes the error
+func (e Auth0FgaApiInternalError) StoreId() string {
+	return e.storeId
+}
+
+// RequestBody returns the original request body
+func (e Auth0FgaApiInternalError) RequestBody() interface{} {
+	return e.requestBody
+}
+
+// RequestMethod returns the method calling the API
+func (e Auth0FgaApiInternalError) RequestMethod() string {
+	return e.requestMethod
+}
+
+// EndpointCategory returns the original API category
+func (e Auth0FgaApiInternalError) EndpointCategory() string {
+	return e.endpointCategory
+}
+
+// ModelDecodeError returns any error when decoding the unpacked model of the error
+func (e Auth0FgaApiInternalError) ModelDecodeError() error {
+	return e.modelDecodeError
+}
+
+// ResponseStatusCode returns the original API response status code
+func (e Auth0FgaApiInternalError) ResponseStatusCode() int {
+	return e.responseStatusCode
+}
+
+// ResponseHeader returns the original API response header
+func (e Auth0FgaApiInternalError) ResponseHeader() http.Header {
+	return e.responseHeader
+}
+
+// Auth0FgaApiRateLimitError will be returned if error happens becuase API's calling rate exceed limit
+
+type Auth0FgaApiRateLimitError struct {
+	body  []byte
+	error string
+	model interface{}
+
+	storeId            string
+	endpointCategory   string
+	requestBody        interface{}
+	requestMethod      string
+	modelDecodeError   error
+	responseStatusCode int
+	responseHeader     http.Header
+
+	rateLimit           int
+	rateUnit            string
+	rateLimitResetEpoch string
+}
+
+// Error returns non-empty string if there was an error.
+func (e Auth0FgaApiRateLimitError) Error() string {
+	return e.error
+}
+
+// Body returns the raw bytes of the response
+func (e Auth0FgaApiRateLimitError) Body() []byte {
+	return e.body
+}
+
+// Model returns the unpacked model of the error
+func (e Auth0FgaApiRateLimitError) Model() interface{} {
+	return e.model
+}
+
+// StoreId returns the store ID for the API that causes the error
+func (e Auth0FgaApiRateLimitError) StoreId() string {
+	return e.storeId
+}
+
+// RequestBody returns the original request body
+func (e Auth0FgaApiRateLimitError) RequestBody() interface{} {
+	return e.requestBody
+}
+
+// RequestMethod returns the method calling the API
+func (e Auth0FgaApiRateLimitError) RequestMethod() string {
+	return e.requestMethod
+}
+
+// RateLimit returns the limit for the API
+func (e Auth0FgaApiRateLimitError) RateLimit() int {
+	return e.rateLimit
+}
+
+// RateUnit returns the unit used for rate limit
+func (e Auth0FgaApiRateLimitError) RateUnit() string {
+	return e.rateUnit
+}
+
+// RateLimitResetEpoch returns the unit used for rate limit
+func (e Auth0FgaApiRateLimitError) RateLimitResetEpoch() string {
+	return e.rateLimitResetEpoch
+}
+
+// EndpointCategory returns the original API category
+func (e Auth0FgaApiRateLimitError) EndpointCategory() string {
+	return e.endpointCategory
+}
+
+// ModelDecodeError returns any error when decoding the unpacked model of the error
+func (e Auth0FgaApiRateLimitError) ModelDecodeError() error {
+	return e.modelDecodeError
+}
+
+// ResponseStatusCode returns the original API response status code
+func (e Auth0FgaApiRateLimitError) ResponseStatusCode() int {
+	return e.responseStatusCode
+}
+
+// ResponseHeader returns the original API response header
+func (e Auth0FgaApiRateLimitError) ResponseHeader() http.Header {
+	return e.responseHeader
+}
