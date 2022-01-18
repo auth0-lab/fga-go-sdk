@@ -1,5 +1,5 @@
 /**
- * Auth0 Fine Grained Authorization (FGA)/Auth0 FGA SDK for Go
+ * Go SDK for Auth0 Fine Grained Authorization (FGA)
  *
  * Auth0 Fine Grained Authorization (FGA) is an early-stage product we are building at Auth0 as part of Auth0Lab to solve fine-grained authorization at scale. If you are interested in learning more about our plans, please reach out via our Discord chat.  The limits and information described in this document is subject to change.
  *
@@ -82,7 +82,7 @@ type Auth0FgaApi interface {
 	/*
 		 * Expand Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
 		 * The expand API will return all users (including user and userset) that have certain relationship with an object in a certain store.
-	This is different from the `/{store_id}/read` API in that both direct and indirect references are returned.
+	This is different from the `/{store_id}/read` API in that both users and computed references are returned.
 	Path parameter `store_id` as well as body parameter `object`, `relation` are all required.
 	The response will return a userset tree whose leaves are the user id and usersets.  Union, intersection and difference operator are located in the intermediate nodes.
 
@@ -152,8 +152,8 @@ type Auth0FgaApi interface {
 	/*
 		 * Read Get tuples from the store that matches a query, without following userset rewrite rules
 		 * The POST read API will return the tuples for a certain store that matches a query filter specified in the body. Tuples and type definitions allow Auth0 FGA to determine whether a relationship exists between an object and an user.
-	It is different from the `/{store_id}/expand` API in that only direct relationships are returned.
-	Path parameter `store_id` is required.  In the body:
+	It is different from the `/{store_id}/expand` API in that only read returns relationship tuples that are stored in the system and satisfy the query.
+	It does not expand or traverse the graph by taking the authorization model into account.Path parameter `store_id` is required.  In the body:
 	1. Object is mandatory. An object can be a full object (e.g., `type:object_id`) or type only (e.g., `type:`).
 	2. User is mandatory in the case the object is type only.
 	## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
@@ -1076,7 +1076,7 @@ func (r ApiExpandRequest) Execute() (ExpandResponse, *_nethttp.Response, error) 
 /*
  * Expand Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
  * The expand API will return all users (including user and userset) that have certain relationship with an object in a certain store.
-This is different from the `/{store_id}/read` API in that both direct and indirect references are returned.
+This is different from the `/{store_id}/read` API in that both users and computed references are returned.
 Path parameter `store_id` as well as body parameter `object`, `relation` are all required.
 The response will return a userset tree whose leaves are the user id and usersets.  Union, intersection and difference operator are located in the intermediate nodes.
 
@@ -1358,8 +1358,8 @@ func (r ApiReadRequest) Execute() (ReadResponse, *_nethttp.Response, error) {
 /*
  * Read Get tuples from the store that matches a query, without following userset rewrite rules
  * The POST read API will return the tuples for a certain store that matches a query filter specified in the body. Tuples and type definitions allow Auth0 FGA to determine whether a relationship exists between an object and an user.
-It is different from the `/{store_id}/expand` API in that only direct relationships are returned.
-Path parameter `store_id` is required.  In the body:
+It is different from the `/{store_id}/expand` API in that only read returns relationship tuples that are stored in the system and satisfy the query.
+It does not expand or traverse the graph by taking the authorization model into account.Path parameter `store_id` is required.  In the body:
 1. Object is mandatory. An object can be a full object (e.g., `type:object_id`) or type only (e.g., `type:`).
 2. User is mandatory in the case the object is type only.
 ## [Limits](https://docs.fga.dev/intro/dashboard#limitations)

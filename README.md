@@ -25,7 +25,7 @@ Warning: This SDK comes with no SLAs and is not production-ready!
     - [Read](#read)
   - [API Endpoints](#api-endpoints)
   - [Models](#models)
-- [Contributing](#models)
+- [Contributing](#contributing)
   - [Issues](#issues)
   - [Pull Requests](#pull-requests) [Note: We are not accepting Pull Requests at this time!]
 - [License](#license)
@@ -37,7 +37,7 @@ If you are interested in learning more about our plans, please reach out via our
 
 Please note:
 * At this point in time, Auth0 Fine Grained Authorization does not come with any SLAs; availability and uptime are not guaranteed.
-* While this project is in its early stages, the SDK methods are in flux and might change without a major bump.
+* While this project is in its early stages, the SDK methods are in flux and might change without a major bump
 
 ## Resources
 
