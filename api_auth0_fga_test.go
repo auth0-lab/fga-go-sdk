@@ -776,6 +776,153 @@ func TestAuth0FgaApi(t *testing.T) {
 
 	})
 
+	t.Run("Check with 429 error", func(t *testing.T) {
+		test := TestDefinition{
+			Name:           "Check",
+			JsonResponse:   `{"allowed":true, "resolution":""}`,
+			ResponseStatus: 429,
+			Method:         "POST",
+			RequestPath:    "check",
+		}
+		requestBody := CheckRequestParams{
+			TupleKey: &TupleKey{
+				User:     PtrString("anne@auth0.com"),
+				Relation: PtrString("repo_reader"),
+				Object:   PtrString("github-repo:auth0/express-jwt"),
+			},
+		}
+
+		var expectedResponse CheckResponse
+		if err := json.Unmarshal([]byte(test.JsonResponse), &expectedResponse); err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+			func(req *http.Request) (*http.Response, error) {
+				return httpmock.NewStringResponse(429, ""), nil
+			},
+		)
+
+		updatedConfiguration, err := NewConfiguration(UserConfiguration{
+			StoreId:     "6c181474-aaa1-4df7-8929-6e7b3a992754",
+			Environment: "playground",
+			RetryParams: &RetryParams{
+				MaxRetry:    3,
+				MinWaitInMs: 5,
+			},
+		})
+		if err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		//Ensure we never talk to a live host
+		updatedConfiguration.Host = "api.fga.auth0.example"
+
+		updatedApiClient := NewAPIClient(updatedConfiguration)
+
+		_, _, err = updatedApiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		if err == nil {
+			t.Errorf("Expected error with 429 request but there is none")
+			return
+		}
+		rateLimitError, ok := err.(Auth0FgaApiRateLimitError)
+		if !ok {
+			t.Errorf("Expected authentication Error but type is incorrect %v", err)
+			return
+		}
+		// Do some basic validation of the error itself
+
+		if rateLimitError.StoreId() != configuration.StoreId {
+			t.Errorf("Expected store id to be %s but actual %s", configuration.StoreId, rateLimitError.StoreId())
+			return
+		}
+
+		if rateLimitError.EndpointCategory() != "Check" {
+			t.Errorf("Expected category to be Check but actual %s", rateLimitError.EndpointCategory())
+			return
+		}
+
+		if rateLimitError.ResponseStatusCode() != 429 {
+			t.Errorf("Expected status code to be 429 but actual %d", rateLimitError.ResponseStatusCode())
+			return
+		}
+
+	})
+
+	t.Run("Check with initial 429 but eventually resolved", func(t *testing.T) {
+		test := TestDefinition{
+			Name:           "Check",
+			JsonResponse:   `{"allowed":true, "resolution":""}`,
+			ResponseStatus: 200,
+			Method:         "POST",
+			RequestPath:    "check",
+		}
+		requestBody := CheckRequestParams{
+			TupleKey: &TupleKey{
+				User:     PtrString("anne@auth0.com"),
+				Relation: PtrString("repo_reader"),
+				Object:   PtrString("github-repo:auth0/express-jwt"),
+			},
+		}
+
+		var expectedResponse CheckResponse
+		if err := json.Unmarshal([]byte(test.JsonResponse), &expectedResponse); err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		firstMock := httpmock.NewStringResponder(429, "")
+		secondMock, _ := httpmock.NewJsonResponder(200, expectedResponse)
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+			firstMock.Then(firstMock).Then(firstMock).Then(secondMock),
+		)
+		updatedConfiguration, err := NewConfiguration(UserConfiguration{
+			StoreId:     "6c181474-aaa1-4df7-8929-6e7b3a992754",
+			Environment: "playground",
+			RetryParams: &RetryParams{
+				MaxRetry:    2,
+				MinWaitInMs: 5,
+			},
+		})
+		if err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		//Ensure we never talk to a live host
+		updatedConfiguration.Host = "api.fga.auth0.example"
+
+		updatedApiClient := NewAPIClient(updatedConfiguration)
+
+		got, response, err := updatedApiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+
+		if err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		if response.StatusCode != test.ResponseStatus {
+			t.Errorf("Auth0Fga%v().Execute() = %v, want %v", test.Name, response.StatusCode, test.ResponseStatus)
+			return
+		}
+
+		responseJson, err := got.MarshalJSON()
+		if err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		if *got.Allowed != *expectedResponse.Allowed {
+			t.Errorf("Auth0Fga%v().Execute() = %v, want %v", test.Name, string(responseJson), test.JsonResponse)
+		}
+	})
+
 	t.Run("Check with 500 error", func(t *testing.T) {
 		test := TestDefinition{
 			Name:           "Check",

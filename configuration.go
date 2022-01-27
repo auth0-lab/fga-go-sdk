@@ -19,6 +19,12 @@ import (
 	"strings"
 )
 
+// RetryParams configures configuration for retry in case of HTTP too many request
+type RetryParams struct {
+	MaxRetry    int `json:"maxRetry,omitempty"`
+	MinWaitInMs int `json:"maxRetry,omitempty"`
+}
+
 // Configuration stores the configuration of the API client
 type Configuration struct {
 	Host           string            `json:"host,omitempty"`
@@ -32,6 +38,7 @@ type Configuration struct {
 	ApiTokenIssuer string            `json:"apiTokenIssuer,omitempty"`
 	ApiAudience    string            `json:"apiAudience,omitempty"`
 	HTTPClient     *http.Client
+	RetryParams    *RetryParams
 }
 
 // UserConfiguration stores the configuration provided by the user
@@ -40,6 +47,7 @@ type UserConfiguration struct {
 	ClientId     string `json:"clientId,omitempty"`
 	ClientSecret string `json:"clientSecret,omitempty"`
 	Environment  string `json:"environment,omitempty"`
+	RetryParams  *RetryParams
 }
 
 // EnvironmentConfiguration stores the environment settings
@@ -75,6 +83,14 @@ func getEnvironmentConfiguration(environment string) (*EnvironmentConfiguration,
 	return &environmentConfig, nil
 }
 
+// DefaultRetryParams returns the default retry parameters
+func DefaultRetryParams() *RetryParams {
+	return &RetryParams{
+		MaxRetry:    3,
+		MinWaitInMs: 100,
+	}
+}
+
 // NewConfiguration returns a new Configuration object
 func NewConfiguration(userConfig UserConfiguration) (*Configuration, error) {
 	if userConfig.StoreId == "" {
@@ -101,6 +117,7 @@ func NewConfiguration(userConfig UserConfiguration) (*Configuration, error) {
 		ClientSecret:   userConfig.ClientSecret,
 		ApiTokenIssuer: environmentConfig.ApiTokenIssuer,
 		ApiAudience:    environmentConfig.ApiAudience,
+		RetryParams:    userConfig.RetryParams,
 	}
 
 	return cfg, nil

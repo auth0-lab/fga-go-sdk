@@ -55,7 +55,8 @@ type APIClient struct {
 }
 
 type service struct {
-	client *APIClient
+	client      *APIClient
+	RetryParams *RetryParams
 }
 
 // NewAPIClient creates a new API client. Requires a userAgent string describing your application.
@@ -80,6 +81,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c := &APIClient{}
 	c.cfg = cfg
 	c.common.client = c
+	c.common.RetryParams = cfg.RetryParams
 
 	// API Services
 	c.Auth0FgaApi = (*Auth0FgaApiService)(&c.common)
