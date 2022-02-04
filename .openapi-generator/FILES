@@ -36,9 +36,9 @@ docs/ReadAuthorizationModelResponse.md
 docs/ReadAuthorizationModelsResponse.md
 docs/ReadRequestParams.md
 docs/ReadResponse.md
+docs/ReadSettingsResponse.md
 docs/ReadTuplesRequestParams.md
 docs/ReadTuplesResponse.md
-docs/Settings.md
 docs/Status.md
 docs/TokenIssuer.md
 docs/Tuple.md
@@ -56,7 +56,9 @@ docs/WriteAssertionsRequestParams.md
 docs/WriteAuthorizationModelResponse.md
 docs/WriteRequestParams.md
 docs/WriteSettingsRequestParams.md
+docs/WriteSettingsResponse.md
 docs/WriteTokenIssuersRequestParams.md
+docs/WriteTokenIssuersResponse.md
 git_push.sh
 go.mod
 go.sum
@@ -80,9 +82,9 @@ model_read_authorization_model_response.go
 model_read_authorization_models_response.go
 model_read_request_params.go
 model_read_response.go
+model_read_settings_response.go
 model_read_tuples_request_params.go
 model_read_tuples_response.go
-model_settings.go
 model_status.go
 model_token_issuer.go
 model_tuple.go
@@ -100,7 +102,9 @@ model_write_assertions_request_params.go
 model_write_authorization_model_response.go
 model_write_request_params.go
 model_write_settings_request_params.go
+model_write_settings_response.go
 model_write_token_issuers_request_params.go
+model_write_token_issuers_response.go
 oauth2/LICENSE
 oauth2/ORIGINAL_AUTHORS
 oauth2/ORIGINAL_CONTRIBUTORS

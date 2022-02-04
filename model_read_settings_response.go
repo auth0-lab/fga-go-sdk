@@ -17,35 +17,35 @@ import (
 	"encoding/json"
 )
 
-// Settings struct for Settings
-type Settings struct {
+// ReadSettingsResponse struct for ReadSettingsResponse
+type ReadSettingsResponse struct {
 	Environment  *Environment   `json:"environment,omitempty"`
 	TokenIssuers *[]TokenIssuer `json:"token_issuers,omitempty"`
 }
 
-// NewSettings instantiates a new Settings object
+// NewReadSettingsResponse instantiates a new ReadSettingsResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSettings() *Settings {
-	this := Settings{}
+func NewReadSettingsResponse() *ReadSettingsResponse {
+	this := ReadSettingsResponse{}
 	var environment Environment = ENVIRONMENT_UNSPECIFIED
 	this.Environment = &environment
 	return &this
 }
 
-// NewSettingsWithDefaults instantiates a new Settings object
+// NewReadSettingsResponseWithDefaults instantiates a new ReadSettingsResponse object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewSettingsWithDefaults() *Settings {
-	this := Settings{}
+func NewReadSettingsResponseWithDefaults() *ReadSettingsResponse {
+	this := ReadSettingsResponse{}
 	var environment Environment = ENVIRONMENT_UNSPECIFIED
 	this.Environment = &environment
 	return &this
 }
 
 // GetEnvironment returns the Environment field value if set, zero value otherwise.
-func (o *Settings) GetEnvironment() Environment {
+func (o *ReadSettingsResponse) GetEnvironment() Environment {
 	if o == nil || o.Environment == nil {
 		var ret Environment
 		return ret
@@ -55,7 +55,7 @@ func (o *Settings) GetEnvironment() Environment {
 
 // GetEnvironmentOk returns a tuple with the Environment field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Settings) GetEnvironmentOk() (*Environment, bool) {
+func (o *ReadSettingsResponse) GetEnvironmentOk() (*Environment, bool) {
 	if o == nil || o.Environment == nil {
 		return nil, false
 	}
@@ -63,7 +63,7 @@ func (o *Settings) GetEnvironmentOk() (*Environment, bool) {
 }
 
 // HasEnvironment returns a boolean if a field has been set.
-func (o *Settings) HasEnvironment() bool {
+func (o *ReadSettingsResponse) HasEnvironment() bool {
 	if o != nil && o.Environment != nil {
 		return true
 	}
@@ -72,12 +72,12 @@ func (o *Settings) HasEnvironment() bool {
 }
 
 // SetEnvironment gets a reference to the given Environment and assigns it to the Environment field.
-func (o *Settings) SetEnvironment(v Environment) {
+func (o *ReadSettingsResponse) SetEnvironment(v Environment) {
 	o.Environment = &v
 }
 
 // GetTokenIssuers returns the TokenIssuers field value if set, zero value otherwise.
-func (o *Settings) GetTokenIssuers() []TokenIssuer {
+func (o *ReadSettingsResponse) GetTokenIssuers() []TokenIssuer {
 	if o == nil || o.TokenIssuers == nil {
 		var ret []TokenIssuer
 		return ret
@@ -87,7 +87,7 @@ func (o *Settings) GetTokenIssuers() []TokenIssuer {
 
 // GetTokenIssuersOk returns a tuple with the TokenIssuers field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Settings) GetTokenIssuersOk() (*[]TokenIssuer, bool) {
+func (o *ReadSettingsResponse) GetTokenIssuersOk() (*[]TokenIssuer, bool) {
 	if o == nil || o.TokenIssuers == nil {
 		return nil, false
 	}
@@ -95,7 +95,7 @@ func (o *Settings) GetTokenIssuersOk() (*[]TokenIssuer, bool) {
 }
 
 // HasTokenIssuers returns a boolean if a field has been set.
-func (o *Settings) HasTokenIssuers() bool {
+func (o *ReadSettingsResponse) HasTokenIssuers() bool {
 	if o != nil && o.TokenIssuers != nil {
 		return true
 	}
@@ -104,11 +104,11 @@ func (o *Settings) HasTokenIssuers() bool {
 }
 
 // SetTokenIssuers gets a reference to the given []TokenIssuer and assigns it to the TokenIssuers field.
-func (o *Settings) SetTokenIssuers(v []TokenIssuer) {
+func (o *ReadSettingsResponse) SetTokenIssuers(v []TokenIssuer) {
 	o.TokenIssuers = &v
 }
 
-func (o Settings) MarshalJSON() ([]byte, error) {
+func (o ReadSettingsResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Environment != nil {
 		toSerialize["environment"] = o.Environment
@@ -119,38 +119,38 @@ func (o Settings) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableSettings struct {
-	value *Settings
+type NullableReadSettingsResponse struct {
+	value *ReadSettingsResponse
 	isSet bool
 }
 
-func (v NullableSettings) Get() *Settings {
+func (v NullableReadSettingsResponse) Get() *ReadSettingsResponse {
 	return v.value
 }
 
-func (v *NullableSettings) Set(val *Settings) {
+func (v *NullableReadSettingsResponse) Set(val *ReadSettingsResponse) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableSettings) IsSet() bool {
+func (v NullableReadSettingsResponse) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableSettings) Unset() {
+func (v *NullableReadSettingsResponse) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableSettings(val *Settings) *NullableSettings {
-	return &NullableSettings{value: val, isSet: true}
+func NewNullableReadSettingsResponse(val *ReadSettingsResponse) *NullableReadSettingsResponse {
+	return &NullableReadSettingsResponse{value: val, isSet: true}
 }
 
-func (v NullableSettings) MarshalJSON() ([]byte, error) {
+func (v NullableReadSettingsResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableSettings) UnmarshalJSON(src []byte) error {
+func (v *NullableReadSettingsResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

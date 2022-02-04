@@ -396,9 +396,9 @@ type Auth0FgaApi interface {
 
 	/*
 	 * ReadSettingsExecute executes the request
-	 * @return Settings
+	 * @return ReadSettingsResponse
 	 */
-	ReadSettingsExecute(r ApiReadSettingsRequest) (Settings, *_nethttp.Response, error)
+	ReadSettingsExecute(r ApiReadSettingsRequest) (ReadSettingsResponse, *_nethttp.Response, error)
 
 	/*
 		 * Write Add or delete tuples from the store
@@ -473,7 +473,7 @@ type Auth0FgaApi interface {
 	The response will return the authorization model's ID in the `id` field.
 
 	## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
-	- There can be at most **10** items in the type_definitions array.
+	- There can be at most **24** items in the type_definitions array.
 	- Each store has a limit of **10** POST authorization-models requests per minute (RPM).
 	## Example
 	To update the authorization model with a single `document` authorization model, call POST authorization-models API with the body:
@@ -545,9 +545,9 @@ type Auth0FgaApi interface {
 
 	/*
 	 * WriteSettingsExecute executes the request
-	 * @return Settings
+	 * @return WriteSettingsResponse
 	 */
-	WriteSettingsExecute(r ApiWriteSettingsRequest) (Settings, *_nethttp.Response, error)
+	WriteSettingsExecute(r ApiWriteSettingsRequest) (WriteSettingsResponse, *_nethttp.Response, error)
 
 	/*
 		 * WriteTokenIssuer Add 3rd party token issuer for Auth0 FGA read and write operations
@@ -559,11 +559,10 @@ type Auth0FgaApi interface {
 	1. In the 3rd party issuer, configure Auth0 FGA API with the following audience in its issuer configuration: `https://api.us1.fga.dev`.
 	2. Call POST token-issuers API with the body: `{"issuer_url": "https://example.issuer.com"}`
 
-	Auth0 FGA's response will include the id that is associated with the token issuer as well as the issuer url, and looks like
+	Auth0 FGA's response will be the id that is associated with the token issuer as in:
 	```json
 	{
-	  "id":"0ujsszwN8NRY24YaXiTIE2VWDTS",
-	  "issuer_url":"https://example.issuer.com"
+	  "id":"0ujsszwN8NRY24YaXiTIE2VWDTS"
 	}
 	```
 
@@ -574,9 +573,9 @@ type Auth0FgaApi interface {
 
 	/*
 	 * WriteTokenIssuerExecute executes the request
-	 * @return TokenIssuer
+	 * @return WriteTokenIssuersResponse
 	 */
-	WriteTokenIssuerExecute(r ApiWriteTokenIssuerRequest) (TokenIssuer, *_nethttp.Response, error)
+	WriteTokenIssuerExecute(r ApiWriteTokenIssuerRequest) (WriteTokenIssuersResponse, *_nethttp.Response, error)
 }
 
 // Auth0FgaApiService Auth0FgaApi service
@@ -2557,7 +2556,7 @@ type ApiReadSettingsRequest struct {
 	ApiService Auth0FgaApi
 }
 
-func (r ApiReadSettingsRequest) Execute() (Settings, *_nethttp.Response, error) {
+func (r ApiReadSettingsRequest) Execute() (ReadSettingsResponse, *_nethttp.Response, error) {
 	return r.ApiService.ReadSettingsExecute(r)
 }
 
@@ -2591,9 +2590,9 @@ func (a *Auth0FgaApiService) ReadSettings(ctx _context.Context) ApiReadSettingsR
 
 /*
  * Execute executes the request
- * @return Settings
+ * @return ReadSettingsResponse
  */
-func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Settings, *_nethttp.Response, error) {
+func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (ReadSettingsResponse, *_nethttp.Response, error) {
 	var maxRetry int
 	var minWaitInMs int
 
@@ -2612,7 +2611,7 @@ func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Sett
 			localVarFormFileName string
 			localVarFileName     string
 			localVarFileBytes    []byte
-			localVarReturnValue  Settings
+			localVarReturnValue  ReadSettingsResponse
 		)
 
 		localVarPath := "/{store_id}/settings"
@@ -2797,7 +2796,7 @@ func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Sett
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue Settings
+	var localVarReturnValue ReadSettingsResponse
 	// should never have reached this
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
@@ -3136,7 +3135,7 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 
 	for i := 0; i < maxRetry+1; i++ {
 		var (
-			localVarHTTPMethod   = _nethttp.MethodPost
+			localVarHTTPMethod   = _nethttp.MethodPut
 			localVarPostBody     interface{}
 			localVarFormFileName string
 			localVarFileName     string
@@ -3360,7 +3359,7 @@ Path parameter `store_id` and `type_definitions` array in the body are required.
 The response will return the authorization model's ID in the `id` field.
 
 ## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
-- There can be at most **10** items in the type_definitions array.
+- There can be at most **24** items in the type_definitions array.
 - Each store has a limit of **10** POST authorization-models requests per minute (RPM).
 ## Example
 To update the authorization model with a single `document` authorization model, call POST authorization-models API with the body:
@@ -3642,7 +3641,7 @@ func (r ApiWriteSettingsRequest) Body(body WriteSettingsRequestParams) ApiWriteS
 	return r
 }
 
-func (r ApiWriteSettingsRequest) Execute() (Settings, *_nethttp.Response, error) {
+func (r ApiWriteSettingsRequest) Execute() (WriteSettingsResponse, *_nethttp.Response, error) {
 	return r.ApiService.WriteSettingsExecute(r)
 }
 
@@ -3670,9 +3669,9 @@ func (a *Auth0FgaApiService) WriteSettings(ctx _context.Context) ApiWriteSetting
 
 /*
  * Execute executes the request
- * @return Settings
+ * @return WriteSettingsResponse
  */
-func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Settings, *_nethttp.Response, error) {
+func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (WriteSettingsResponse, *_nethttp.Response, error) {
 	var maxRetry int
 	var minWaitInMs int
 
@@ -3691,7 +3690,7 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Se
 			localVarFormFileName string
 			localVarFileName     string
 			localVarFileBytes    []byte
-			localVarReturnValue  Settings
+			localVarReturnValue  WriteSettingsResponse
 		)
 
 		localVarPath := "/{store_id}/settings"
@@ -3881,7 +3880,7 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Se
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue Settings
+	var localVarReturnValue WriteSettingsResponse
 	// should never have reached this
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
@@ -3898,7 +3897,7 @@ func (r ApiWriteTokenIssuerRequest) Body(body WriteTokenIssuersRequestParams) Ap
 	return r
 }
 
-func (r ApiWriteTokenIssuerRequest) Execute() (TokenIssuer, *_nethttp.Response, error) {
+func (r ApiWriteTokenIssuerRequest) Execute() (WriteTokenIssuersResponse, *_nethttp.Response, error) {
 	return r.ApiService.WriteTokenIssuerExecute(r)
 }
 
@@ -3912,11 +3911,10 @@ To allow tokens issued by the 3rd party token issuer `https://example.issuer.com
 1. In the 3rd party issuer, configure Auth0 FGA API with the following audience in its issuer configuration: `https://api.us1.fga.dev`.
 2. Call POST token-issuers API with the body: `{"issuer_url": "https://example.issuer.com"}`
 
-Auth0 FGA's response will include the id that is associated with the token issuer as well as the issuer url, and looks like
+Auth0 FGA's response will be the id that is associated with the token issuer as in:
 ```json
 {
-  "id":"0ujsszwN8NRY24YaXiTIE2VWDTS",
-  "issuer_url":"https://example.issuer.com"
+  "id":"0ujsszwN8NRY24YaXiTIE2VWDTS"
 }
 ```
 
@@ -3932,9 +3930,9 @@ func (a *Auth0FgaApiService) WriteTokenIssuer(ctx _context.Context) ApiWriteToke
 
 /*
  * Execute executes the request
- * @return TokenIssuer
+ * @return WriteTokenIssuersResponse
  */
-func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerRequest) (TokenIssuer, *_nethttp.Response, error) {
+func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerRequest) (WriteTokenIssuersResponse, *_nethttp.Response, error) {
 	var maxRetry int
 	var minWaitInMs int
 
@@ -3953,7 +3951,7 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 			localVarFormFileName string
 			localVarFileName     string
 			localVarFileBytes    []byte
-			localVarReturnValue  TokenIssuer
+			localVarReturnValue  WriteTokenIssuersResponse
 		)
 
 		localVarPath := "/{store_id}/settings/token-issuers"
@@ -4143,7 +4141,7 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue TokenIssuer
+	var localVarReturnValue WriteTokenIssuersResponse
 	// should never have reached this
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }

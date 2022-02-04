@@ -292,7 +292,7 @@ Class | Method | HTTP request | Description
 *Auth0FgaApi* | [**ReadAuthorizationModels**](docs/Auth0FgaApi.md#readauthorizationmodels) | **Get** /{store_id}/authorization-models | Return all the authorization model IDs for a particular store
 *Auth0FgaApi* | [**ReadSettings**](docs/Auth0FgaApi.md#readsettings) | **Get** /{store_id}/settings | Return store settings, including the environment tag
 *Auth0FgaApi* | [**Write**](docs/Auth0FgaApi.md#write) | **Post** /{store_id}/write | Add or delete tuples from the store
-*Auth0FgaApi* | [**WriteAssertions**](docs/Auth0FgaApi.md#writeassertions) | **Post** /{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
+*Auth0FgaApi* | [**WriteAssertions**](docs/Auth0FgaApi.md#writeassertions) | **Put** /{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
 *Auth0FgaApi* | [**WriteAuthorizationModel**](docs/Auth0FgaApi.md#writeauthorizationmodel) | **Post** /{store_id}/authorization-models | Create a new authorization model
 *Auth0FgaApi* | [**WriteSettings**](docs/Auth0FgaApi.md#writesettings) | **Patch** /{store_id}/settings | Update the environment tag for a store
 *Auth0FgaApi* | [**WriteTokenIssuer**](docs/Auth0FgaApi.md#writetokenissuer) | **Post** /{store_id}/settings/token-issuers | Add 3rd party token issuer for Auth0 FGA read and write operations
@@ -320,9 +320,9 @@ Class | Method | HTTP request | Description
  - [ReadAuthorizationModelsResponse](docs/ReadAuthorizationModelsResponse.md)
  - [ReadRequestParams](docs/ReadRequestParams.md)
  - [ReadResponse](docs/ReadResponse.md)
+ - [ReadSettingsResponse](docs/ReadSettingsResponse.md)
  - [ReadTuplesRequestParams](docs/ReadTuplesRequestParams.md)
  - [ReadTuplesResponse](docs/ReadTuplesResponse.md)
- - [Settings](docs/Settings.md)
  - [Status](docs/Status.md)
  - [TokenIssuer](docs/TokenIssuer.md)
  - [Tuple](docs/Tuple.md)
@@ -340,7 +340,9 @@ Class | Method | HTTP request | Description
  - [WriteAuthorizationModelResponse](docs/WriteAuthorizationModelResponse.md)
  - [WriteRequestParams](docs/WriteRequestParams.md)
  - [WriteSettingsRequestParams](docs/WriteSettingsRequestParams.md)
+ - [WriteSettingsResponse](docs/WriteSettingsResponse.md)
  - [WriteTokenIssuersRequestParams](docs/WriteTokenIssuersRequestParams.md)
+ - [WriteTokenIssuersResponse](docs/WriteTokenIssuersResponse.md)
 
 
 ## Contributing

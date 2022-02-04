@@ -13,7 +13,7 @@ Method | HTTP request | Description
 [**ReadAuthorizationModels**](Auth0FgaApi.md#ReadAuthorizationModels) | **Get** /{store_id}/authorization-models | Return all the authorization model IDs for a particular store
 [**ReadSettings**](Auth0FgaApi.md#ReadSettings) | **Get** /{store_id}/settings | Return store settings, including the environment tag
 [**Write**](Auth0FgaApi.md#Write) | **Post** /{store_id}/write | Add or delete tuples from the store
-[**WriteAssertions**](Auth0FgaApi.md#WriteAssertions) | **Post** /{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
+[**WriteAssertions**](Auth0FgaApi.md#WriteAssertions) | **Put** /{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
 [**WriteAuthorizationModel**](Auth0FgaApi.md#WriteAuthorizationModel) | **Post** /{store_id}/authorization-models | Create a new authorization model
 [**WriteSettings**](Auth0FgaApi.md#WriteSettings) | **Patch** /{store_id}/settings | Update the environment tag for a store
 [**WriteTokenIssuer**](Auth0FgaApi.md#WriteTokenIssuer) | **Post** /{store_id}/settings/token-issuers | Add 3rd party token issuer for Auth0 FGA read and write operations
@@ -647,7 +647,7 @@ Name | Type | Description  | Notes
 
 ## ReadSettings
 
-> Settings ReadSettings(ctx).Execute()
+> ReadSettingsResponse ReadSettings(ctx).Execute()
 
 Return store settings, including the environment tag
 
@@ -694,7 +694,7 @@ func main() {
             // Handle unknown/undefined error
         }
     }
-    // response from `ReadSettings`: Settings
+    // response from `ReadSettings`: ReadSettingsResponse
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.ReadSettings`: %v\n", resp)
 }
 ```
@@ -716,7 +716,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Settings**](Settings.md)
+[**ReadSettingsResponse**](ReadSettingsResponse.md)
 
 ### Authorization
 
@@ -1003,7 +1003,7 @@ Name | Type | Description  | Notes
 
 ## WriteSettings
 
-> Settings WriteSettings(ctx).Body(body).Execute()
+> WriteSettingsResponse WriteSettings(ctx).Body(body).Execute()
 
 Update the environment tag for a store
 
@@ -1051,7 +1051,7 @@ func main() {
             // Handle unknown/undefined error
         }
     }
-    // response from `WriteSettings`: Settings
+    // response from `WriteSettings`: WriteSettingsResponse
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.WriteSettings`: %v\n", resp)
 }
 ```
@@ -1074,7 +1074,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Settings**](Settings.md)
+[**WriteSettingsResponse**](WriteSettingsResponse.md)
 
 ### Authorization
 
@@ -1092,7 +1092,7 @@ Name | Type | Description  | Notes
 
 ## WriteTokenIssuer
 
-> TokenIssuer WriteTokenIssuer(ctx).Body(body).Execute()
+> WriteTokenIssuersResponse WriteTokenIssuer(ctx).Body(body).Execute()
 
 Add 3rd party token issuer for Auth0 FGA read and write operations
 
@@ -1140,7 +1140,7 @@ func main() {
             // Handle unknown/undefined error
         }
     }
-    // response from `WriteTokenIssuer`: TokenIssuer
+    // response from `WriteTokenIssuer`: WriteTokenIssuersResponse
     fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.WriteTokenIssuer`: %v\n", resp)
 }
 ```
@@ -1163,7 +1163,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**TokenIssuer**](TokenIssuer.md)
+[**WriteTokenIssuersResponse**](WriteTokenIssuersResponse.md)
 
 ### Authorization
 
