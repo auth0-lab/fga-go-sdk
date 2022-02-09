@@ -85,7 +85,7 @@ type Auth0FgaApi interface {
 	/*
 		 * Expand Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
 		 * The expand API will return all users (including user and userset) that have certain relationship with an object in a certain store.
-	This is different from the `/{store_id}/read` API in that both users and computed references are returned.
+	This is different from the `/stores/{store_id}/read` API in that both users and computed references are returned.
 	Path parameter `store_id` as well as body parameter `object`, `relation` are all required.
 	The response will return a userset tree whose leaves are the user id and usersets.  Union, intersection and difference operator are located in the intermediate nodes.
 
@@ -155,7 +155,7 @@ type Auth0FgaApi interface {
 	/*
 		 * Read Get tuples from the store that matches a query, without following userset rewrite rules
 		 * The POST read API will return the tuples for a certain store that matches a query filter specified in the body. Tuples and type definitions allow Auth0 FGA to determine whether a relationship exists between an object and an user.
-	It is different from the `/{store_id}/expand` API in that only read returns relationship tuples that are stored in the system and satisfy the query.
+	It is different from the `/stores/{store_id}/expand` API in that only read returns relationship tuples that are stored in the system and satisfy the query.
 	It does not expand or traverse the graph by taking the authorization model into account.Path parameter `store_id` is required.  In the body:
 	1. Object is mandatory. An object can be a full object (e.g., `type:object_id`) or type only (e.g., `type:`).
 	2. User is mandatory in the case the object is type only.
@@ -173,15 +173,15 @@ type Auth0FgaApi interface {
 	  }
 	}
 	```
-	The API will return something like
+	The API will return tuples and an optional continuation token, something like
 	```json
 	{
 	  "tuples": [
 	    {
 	      "key": {
-	        "user": "bob@auth0.com"
+	        "user": "bob@auth0.com",
 	        "relation": "reader",
-	        "object": "document:2021-budget",
+	        "object": "document:2021-budget"
 	      },
 	      "timestamp": "2021-10-06T15:32:11.128Z"
 	    }
@@ -672,7 +672,7 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 			localVarReturnValue  CheckResponse
 		)
 
-		localVarPath := "/{store_id}/check"
+		localVarPath := "/stores/{store_id}/check"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 
 		localVarHeaderParams := make(map[string]string)
@@ -919,7 +919,7 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 			localVarReturnValue  map[string]interface{}
 		)
 
-		localVarPath := "/{store_id}/settings/token-issuers/{id}"
+		localVarPath := "/stores/{store_id}/settings/token-issuers/{id}"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 		localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", _neturl.PathEscape(parameterToString(r.id, "")), -1)
 
@@ -1126,7 +1126,7 @@ func (r ApiExpandRequest) Execute() (ExpandResponse, *_nethttp.Response, error) 
 /*
  * Expand Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
  * The expand API will return all users (including user and userset) that have certain relationship with an object in a certain store.
-This is different from the `/{store_id}/read` API in that both users and computed references are returned.
+This is different from the `/stores/{store_id}/read` API in that both users and computed references are returned.
 Path parameter `store_id` as well as body parameter `object`, `relation` are all required.
 The response will return a userset tree whose leaves are the user id and usersets.  Union, intersection and difference operator are located in the intermediate nodes.
 
@@ -1218,7 +1218,7 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 			localVarReturnValue  ExpandResponse
 		)
 
-		localVarPath := "/{store_id}/expand"
+		localVarPath := "/stores/{store_id}/expand"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 
 		localVarHeaderParams := make(map[string]string)
@@ -1429,7 +1429,7 @@ func (r ApiReadRequest) Execute() (ReadResponse, *_nethttp.Response, error) {
 /*
  * Read Get tuples from the store that matches a query, without following userset rewrite rules
  * The POST read API will return the tuples for a certain store that matches a query filter specified in the body. Tuples and type definitions allow Auth0 FGA to determine whether a relationship exists between an object and an user.
-It is different from the `/{store_id}/expand` API in that only read returns relationship tuples that are stored in the system and satisfy the query.
+It is different from the `/stores/{store_id}/expand` API in that only read returns relationship tuples that are stored in the system and satisfy the query.
 It does not expand or traverse the graph by taking the authorization model into account.Path parameter `store_id` is required.  In the body:
 1. Object is mandatory. An object can be a full object (e.g., `type:object_id`) or type only (e.g., `type:`).
 2. User is mandatory in the case the object is type only.
@@ -1447,15 +1447,15 @@ To query for all objects that `bob@auth0.com` has `reader` relationship in the d
   }
 }
 ```
-The API will return something like
+The API will return tuples and an optional continuation token, something like
 ```json
 {
   "tuples": [
     {
       "key": {
-        "user": "bob@auth0.com"
+        "user": "bob@auth0.com",
         "relation": "reader",
-        "object": "document:2021-budget",
+        "object": "document:2021-budget"
       },
       "timestamp": "2021-10-06T15:32:11.128Z"
     }
@@ -1559,7 +1559,7 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 			localVarReturnValue  ReadResponse
 		)
 
-		localVarPath := "/{store_id}/read"
+		localVarPath := "/stores/{store_id}/read"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 
 		localVarHeaderParams := make(map[string]string)
@@ -1803,7 +1803,7 @@ func (a *Auth0FgaApiService) ReadAssertionsExecute(r ApiReadAssertionsRequest) (
 			localVarReturnValue  ReadAssertionsResponse
 		)
 
-		localVarPath := "/{store_id}/assertions/{authorization_model_id}"
+		localVarPath := "/stores/{store_id}/assertions/{authorization_model_id}"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 		localVarPath = strings.Replace(localVarPath, "{"+"authorization_model_id"+"}", _neturl.PathEscape(parameterToString(r.authorizationModelId, "")), -1)
 
@@ -2083,7 +2083,7 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelExecute(r ApiReadAuthorizatio
 			localVarReturnValue  ReadAuthorizationModelResponse
 		)
 
-		localVarPath := "/{store_id}/authorization-models/{id}"
+		localVarPath := "/stores/{store_id}/authorization-models/{id}"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 		localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", _neturl.PathEscape(parameterToString(r.id, "")), -1)
 
@@ -2358,7 +2358,7 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 			localVarReturnValue  ReadAuthorizationModelsResponse
 		)
 
-		localVarPath := "/{store_id}/authorization-models"
+		localVarPath := "/stores/{store_id}/authorization-models"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 
 		localVarHeaderParams := make(map[string]string)
@@ -2614,7 +2614,7 @@ func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Read
 			localVarReturnValue  ReadSettingsResponse
 		)
 
-		localVarPath := "/{store_id}/settings"
+		localVarPath := "/stores/{store_id}/settings"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 
 		localVarHeaderParams := make(map[string]string)
@@ -2893,7 +2893,7 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 			localVarReturnValue  map[string]interface{}
 		)
 
-		localVarPath := "/{store_id}/write"
+		localVarPath := "/stores/{store_id}/write"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 
 		localVarHeaderParams := make(map[string]string)
@@ -3143,7 +3143,7 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 			localVarReturnValue  map[string]interface{}
 		)
 
-		localVarPath := "/{store_id}/assertions/{authorization_model_id}"
+		localVarPath := "/stores/{store_id}/assertions/{authorization_model_id}"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 		localVarPath = strings.Replace(localVarPath, "{"+"authorization_model_id"+"}", _neturl.PathEscape(parameterToString(r.authorizationModelId, "")), -1)
 
@@ -3437,7 +3437,7 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 			localVarReturnValue  WriteAuthorizationModelResponse
 		)
 
-		localVarPath := "/{store_id}/authorization-models"
+		localVarPath := "/stores/{store_id}/authorization-models"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 
 		localVarHeaderParams := make(map[string]string)
@@ -3693,7 +3693,7 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Wr
 			localVarReturnValue  WriteSettingsResponse
 		)
 
-		localVarPath := "/{store_id}/settings"
+		localVarPath := "/stores/{store_id}/settings"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 
 		localVarHeaderParams := make(map[string]string)
@@ -3954,7 +3954,7 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 			localVarReturnValue  WriteTokenIssuersResponse
 		)
 
-		localVarPath := "/{store_id}/settings/token-issuers"
+		localVarPath := "/stores/{store_id}/settings/token-issuers"
 		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
 
 		localVarHeaderParams := make(map[string]string)

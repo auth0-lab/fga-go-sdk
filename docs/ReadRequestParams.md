@@ -6,6 +6,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **TupleKey** | Pointer to [**TupleKey**](TupleKey.md) |  | [optional] 
 **AuthorizationModelId** | Pointer to **string** |  | [optional] 
+**PageSize** | Pointer to **int32** |  | [optional] 
+**ContinuationToken** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
@@ -75,6 +77,56 @@ SetAuthorizationModelId sets AuthorizationModelId field to given value.
 `func (o *ReadRequestParams) HasAuthorizationModelId() bool`
 
 HasAuthorizationModelId returns a boolean if a field has been set.
+
+### GetPageSize
+
+`func (o *ReadRequestParams) GetPageSize() int32`
+
+GetPageSize returns the PageSize field if non-nil, zero value otherwise.
+
+### GetPageSizeOk
+
+`func (o *ReadRequestParams) GetPageSizeOk() (*int32, bool)`
+
+GetPageSizeOk returns a tuple with the PageSize field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPageSize
+
+`func (o *ReadRequestParams) SetPageSize(v int32)`
+
+SetPageSize sets PageSize field to given value.
+
+### HasPageSize
+
+`func (o *ReadRequestParams) HasPageSize() bool`
+
+HasPageSize returns a boolean if a field has been set.
+
+### GetContinuationToken
+
+`func (o *ReadRequestParams) GetContinuationToken() string`
+
+GetContinuationToken returns the ContinuationToken field if non-nil, zero value otherwise.
+
+### GetContinuationTokenOk
+
+`func (o *ReadRequestParams) GetContinuationTokenOk() (*string, bool)`
+
+GetContinuationTokenOk returns a tuple with the ContinuationToken field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetContinuationToken
+
+`func (o *ReadRequestParams) SetContinuationToken(v string)`
+
+SetContinuationToken sets ContinuationToken field to given value.
+
+### HasContinuationToken
+
+`func (o *ReadRequestParams) HasContinuationToken() bool`
+
+HasContinuationToken returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

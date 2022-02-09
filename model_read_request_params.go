@@ -21,6 +21,8 @@ import (
 type ReadRequestParams struct {
 	TupleKey             *TupleKey `json:"tuple_key,omitempty"`
 	AuthorizationModelId *string   `json:"authorization_model_id,omitempty"`
+	PageSize             *int32    `json:"page_size,omitempty"`
+	ContinuationToken    *string   `json:"continuation_token,omitempty"`
 }
 
 // NewReadRequestParams instantiates a new ReadRequestParams object
@@ -104,6 +106,70 @@ func (o *ReadRequestParams) SetAuthorizationModelId(v string) {
 	o.AuthorizationModelId = &v
 }
 
+// GetPageSize returns the PageSize field value if set, zero value otherwise.
+func (o *ReadRequestParams) GetPageSize() int32 {
+	if o == nil || o.PageSize == nil {
+		var ret int32
+		return ret
+	}
+	return *o.PageSize
+}
+
+// GetPageSizeOk returns a tuple with the PageSize field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ReadRequestParams) GetPageSizeOk() (*int32, bool) {
+	if o == nil || o.PageSize == nil {
+		return nil, false
+	}
+	return o.PageSize, true
+}
+
+// HasPageSize returns a boolean if a field has been set.
+func (o *ReadRequestParams) HasPageSize() bool {
+	if o != nil && o.PageSize != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetPageSize gets a reference to the given int32 and assigns it to the PageSize field.
+func (o *ReadRequestParams) SetPageSize(v int32) {
+	o.PageSize = &v
+}
+
+// GetContinuationToken returns the ContinuationToken field value if set, zero value otherwise.
+func (o *ReadRequestParams) GetContinuationToken() string {
+	if o == nil || o.ContinuationToken == nil {
+		var ret string
+		return ret
+	}
+	return *o.ContinuationToken
+}
+
+// GetContinuationTokenOk returns a tuple with the ContinuationToken field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ReadRequestParams) GetContinuationTokenOk() (*string, bool) {
+	if o == nil || o.ContinuationToken == nil {
+		return nil, false
+	}
+	return o.ContinuationToken, true
+}
+
+// HasContinuationToken returns a boolean if a field has been set.
+func (o *ReadRequestParams) HasContinuationToken() bool {
+	if o != nil && o.ContinuationToken != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetContinuationToken gets a reference to the given string and assigns it to the ContinuationToken field.
+func (o *ReadRequestParams) SetContinuationToken(v string) {
+	o.ContinuationToken = &v
+}
+
 func (o ReadRequestParams) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.TupleKey != nil {
@@ -111,6 +177,12 @@ func (o ReadRequestParams) MarshalJSON() ([]byte, error) {
 	}
 	if o.AuthorizationModelId != nil {
 		toSerialize["authorization_model_id"] = o.AuthorizationModelId
+	}
+	if o.PageSize != nil {
+		toSerialize["page_size"] = o.PageSize
+	}
+	if o.ContinuationToken != nil {
+		toSerialize["continuation_token"] = o.ContinuationToken
 	}
 	return json.Marshal(toSerialize)
 }

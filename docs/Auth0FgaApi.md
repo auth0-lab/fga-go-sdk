@@ -4,19 +4,19 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**Check**](Auth0FgaApi.md#Check) | **Post** /{store_id}/check | Check whether a user is authorized to access an object
-[**DeleteTokenIssuer**](Auth0FgaApi.md#DeleteTokenIssuer) | **Delete** /{store_id}/settings/token-issuers/{id} | Remove 3rd party token issuer for Auth0 FGA read and write operation
-[**Expand**](Auth0FgaApi.md#Expand) | **Post** /{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
-[**Read**](Auth0FgaApi.md#Read) | **Post** /{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
-[**ReadAssertions**](Auth0FgaApi.md#ReadAssertions) | **Get** /{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
-[**ReadAuthorizationModel**](Auth0FgaApi.md#ReadAuthorizationModel) | **Get** /{store_id}/authorization-models/{id} | Return a particular version of an authorization model
-[**ReadAuthorizationModels**](Auth0FgaApi.md#ReadAuthorizationModels) | **Get** /{store_id}/authorization-models | Return all the authorization model IDs for a particular store
-[**ReadSettings**](Auth0FgaApi.md#ReadSettings) | **Get** /{store_id}/settings | Return store settings, including the environment tag
-[**Write**](Auth0FgaApi.md#Write) | **Post** /{store_id}/write | Add or delete tuples from the store
-[**WriteAssertions**](Auth0FgaApi.md#WriteAssertions) | **Put** /{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
-[**WriteAuthorizationModel**](Auth0FgaApi.md#WriteAuthorizationModel) | **Post** /{store_id}/authorization-models | Create a new authorization model
-[**WriteSettings**](Auth0FgaApi.md#WriteSettings) | **Patch** /{store_id}/settings | Update the environment tag for a store
-[**WriteTokenIssuer**](Auth0FgaApi.md#WriteTokenIssuer) | **Post** /{store_id}/settings/token-issuers | Add 3rd party token issuer for Auth0 FGA read and write operations
+[**Check**](Auth0FgaApi.md#Check) | **Post** /stores/{store_id}/check | Check whether a user is authorized to access an object
+[**DeleteTokenIssuer**](Auth0FgaApi.md#DeleteTokenIssuer) | **Delete** /stores/{store_id}/settings/token-issuers/{id} | Remove 3rd party token issuer for Auth0 FGA read and write operation
+[**Expand**](Auth0FgaApi.md#Expand) | **Post** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
+[**Read**](Auth0FgaApi.md#Read) | **Post** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
+[**ReadAssertions**](Auth0FgaApi.md#ReadAssertions) | **Get** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
+[**ReadAuthorizationModel**](Auth0FgaApi.md#ReadAuthorizationModel) | **Get** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
+[**ReadAuthorizationModels**](Auth0FgaApi.md#ReadAuthorizationModels) | **Get** /stores/{store_id}/authorization-models | Return all the authorization model IDs for a particular store
+[**ReadSettings**](Auth0FgaApi.md#ReadSettings) | **Get** /stores/{store_id}/settings | Return store settings, including the environment tag
+[**Write**](Auth0FgaApi.md#Write) | **Post** /stores/{store_id}/write | Add or delete tuples from the store
+[**WriteAssertions**](Auth0FgaApi.md#WriteAssertions) | **Put** /stores/{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
+[**WriteAuthorizationModel**](Auth0FgaApi.md#WriteAuthorizationModel) | **Post** /stores/{store_id}/authorization-models | Create a new authorization model
+[**WriteSettings**](Auth0FgaApi.md#WriteSettings) | **Patch** /stores/{store_id}/settings | Update the environment tag for a store
+[**WriteTokenIssuer**](Auth0FgaApi.md#WriteTokenIssuer) | **Post** /stores/{store_id}/settings/token-issuers | Add 3rd party token issuer for Auth0 FGA read and write operations
 
 
 

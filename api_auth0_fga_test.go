@@ -127,7 +127,7 @@ func TestAuth0FgaApiConfiguration(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder("GET", fmt.Sprintf("%s://%s/%s/authorization-models", configuration.Scheme, configuration.Host, configuration.StoreId),
+		httpmock.RegisterResponder("GET", fmt.Sprintf("%s://%s/stores/%s/authorization-models", configuration.Scheme, configuration.Host, configuration.StoreId),
 			func(req *http.Request) (*http.Response, error) {
 				resp, err := httpmock.NewJsonResponse(200, ReadAuthorizationModelsResponse{AuthorizationModelIds: &[]string{
 					"1uHxCSuTP0VKPYSnkq1pbb1jeZw",
@@ -163,7 +163,7 @@ func TestAuth0FgaApiConfiguration(t *testing.T) {
 			t.Errorf("Expected call to get access token to be made exactly once, saw: %d", numCalls)
 			return
 		}
-		numCalls = info[fmt.Sprintf("GET %s://%s/%s/authorization-models", configuration.Scheme, configuration.Host, configuration.StoreId)]
+		numCalls = info[fmt.Sprintf("GET %s://%s/stores/%s/authorization-models", configuration.Scheme, configuration.Host, configuration.StoreId)]
 		if numCalls != 1 {
 			t.Errorf("Expected call to get authorization models to be made exactly once, saw: %d", numCalls)
 			return
@@ -185,7 +185,7 @@ func TestAuth0FgaApiConfiguration(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder("GET", fmt.Sprintf("%s://%s/%s/authorization-models", configuration.Scheme, configuration.Host, configuration.StoreId),
+		httpmock.RegisterResponder("GET", fmt.Sprintf("%s://%s/stores/%s/authorization-models", configuration.Scheme, configuration.Host, configuration.StoreId),
 			func(req *http.Request) (*http.Response, error) {
 				resp, err := httpmock.NewJsonResponse(200, ReadAuthorizationModelsResponse{AuthorizationModelIds: &[]string{
 					"1uHxCSuTP0VKPYSnkq1pbb1jeZw",
@@ -208,7 +208,7 @@ func TestAuth0FgaApiConfiguration(t *testing.T) {
 			t.Errorf("Unexpected call to get access token made. Expected 0, saw: %d", numCalls)
 			return
 		}
-		numCalls = info[fmt.Sprintf("GET %s://%s/%s/authorization-models", configuration.Scheme, configuration.Host, configuration.StoreId)]
+		numCalls = info[fmt.Sprintf("GET %s://%s/stores/%s/authorization-models", configuration.Scheme, configuration.Host, configuration.StoreId)]
 		if numCalls != 1 {
 			t.Errorf("Expected call to get authorization models to be made exactly once, saw: %d", numCalls)
 			return
@@ -248,7 +248,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				resp, err := httpmock.NewJsonResponse(test.ResponseStatus, expectedResponse)
 				if err != nil {
@@ -322,7 +322,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				resp, err := httpmock.NewJsonResponse(test.ResponseStatus, expectedResponse)
 				if err != nil {
@@ -367,7 +367,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath, modelId),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath, modelId),
 			func(req *http.Request) (*http.Response, error) {
 				resp, err := httpmock.NewJsonResponse(test.ResponseStatus, expectedResponse)
 				if err != nil {
@@ -422,7 +422,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				resp, err := httpmock.NewJsonResponse(test.ResponseStatus, expectedResponse)
 				if err != nil {
@@ -479,7 +479,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				resp, err := httpmock.NewJsonResponse(test.ResponseStatus, expectedResponse)
 				if err != nil {
@@ -527,7 +527,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				resp, err := httpmock.NewJsonResponse(test.ResponseStatus, expectedResponse)
 				if err != nil {
@@ -572,7 +572,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				resp, err := httpmock.NewJsonResponse(test.ResponseStatus, expectedResponse)
 				if err != nil {
@@ -624,7 +624,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				resp, err := httpmock.NewJsonResponse(test.ResponseStatus, expectedResponse)
 				if err != nil {
@@ -680,7 +680,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				return httpmock.NewStringResponse(400, ""), nil
 			},
@@ -742,7 +742,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				return httpmock.NewStringResponse(401, ""), nil
 			},
@@ -800,7 +800,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				return httpmock.NewStringResponse(429, ""), nil
 			},
@@ -879,7 +879,7 @@ func TestAuth0FgaApi(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 		firstMock := httpmock.NewStringResponder(429, "")
 		secondMock, _ := httpmock.NewJsonResponder(200, expectedResponse)
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			firstMock.Then(firstMock).Then(firstMock).Then(secondMock),
 		)
 		updatedConfiguration, err := NewConfiguration(UserConfiguration{
@@ -947,7 +947,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
-		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
 				return httpmock.NewStringResponse(500, ""), nil
 			},

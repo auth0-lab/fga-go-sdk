@@ -37,8 +37,6 @@ docs/ReadAuthorizationModelsResponse.md
 docs/ReadRequestParams.md
 docs/ReadResponse.md
 docs/ReadSettingsResponse.md
-docs/ReadTuplesRequestParams.md
-docs/ReadTuplesResponse.md
 docs/Status.md
 docs/TokenIssuer.md
 docs/Tuple.md
@@ -83,8 +81,6 @@ model_read_authorization_models_response.go
 model_read_request_params.go
 model_read_response.go
 model_read_settings_response.go
-model_read_tuples_request_params.go
-model_read_tuples_response.go
 model_status.go
 model_token_issuer.go
 model_tuple.go

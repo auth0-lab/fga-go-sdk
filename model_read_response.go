@@ -19,7 +19,8 @@ import (
 
 // ReadResponse struct for ReadResponse
 type ReadResponse struct {
-	Tuples *[]Tuple `json:"tuples,omitempty"`
+	Tuples            *[]Tuple `json:"tuples,omitempty"`
+	ContinuationToken *string  `json:"continuation_token,omitempty"`
 }
 
 // NewReadResponse instantiates a new ReadResponse object
@@ -71,10 +72,45 @@ func (o *ReadResponse) SetTuples(v []Tuple) {
 	o.Tuples = &v
 }
 
+// GetContinuationToken returns the ContinuationToken field value if set, zero value otherwise.
+func (o *ReadResponse) GetContinuationToken() string {
+	if o == nil || o.ContinuationToken == nil {
+		var ret string
+		return ret
+	}
+	return *o.ContinuationToken
+}
+
+// GetContinuationTokenOk returns a tuple with the ContinuationToken field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ReadResponse) GetContinuationTokenOk() (*string, bool) {
+	if o == nil || o.ContinuationToken == nil {
+		return nil, false
+	}
+	return o.ContinuationToken, true
+}
+
+// HasContinuationToken returns a boolean if a field has been set.
+func (o *ReadResponse) HasContinuationToken() bool {
+	if o != nil && o.ContinuationToken != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetContinuationToken gets a reference to the given string and assigns it to the ContinuationToken field.
+func (o *ReadResponse) SetContinuationToken(v string) {
+	o.ContinuationToken = &v
+}
+
 func (o ReadResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Tuples != nil {
 		toSerialize["tuples"] = o.Tuples
+	}
+	if o.ContinuationToken != nil {
+		toSerialize["continuation_token"] = o.ContinuationToken
 	}
 	return json.Marshal(toSerialize)
 }

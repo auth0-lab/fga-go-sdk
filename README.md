@@ -283,19 +283,19 @@ data, response, err := apiClient.Auth0FgaApi.Read(context.Background()).Body(bod
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*Auth0FgaApi* | [**Check**](docs/Auth0FgaApi.md#check) | **Post** /{store_id}/check | Check whether a user is authorized to access an object
-*Auth0FgaApi* | [**DeleteTokenIssuer**](docs/Auth0FgaApi.md#deletetokenissuer) | **Delete** /{store_id}/settings/token-issuers/{id} | Remove 3rd party token issuer for Auth0 FGA read and write operation
-*Auth0FgaApi* | [**Expand**](docs/Auth0FgaApi.md#expand) | **Post** /{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
-*Auth0FgaApi* | [**Read**](docs/Auth0FgaApi.md#read) | **Post** /{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
-*Auth0FgaApi* | [**ReadAssertions**](docs/Auth0FgaApi.md#readassertions) | **Get** /{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
-*Auth0FgaApi* | [**ReadAuthorizationModel**](docs/Auth0FgaApi.md#readauthorizationmodel) | **Get** /{store_id}/authorization-models/{id} | Return a particular version of an authorization model
-*Auth0FgaApi* | [**ReadAuthorizationModels**](docs/Auth0FgaApi.md#readauthorizationmodels) | **Get** /{store_id}/authorization-models | Return all the authorization model IDs for a particular store
-*Auth0FgaApi* | [**ReadSettings**](docs/Auth0FgaApi.md#readsettings) | **Get** /{store_id}/settings | Return store settings, including the environment tag
-*Auth0FgaApi* | [**Write**](docs/Auth0FgaApi.md#write) | **Post** /{store_id}/write | Add or delete tuples from the store
-*Auth0FgaApi* | [**WriteAssertions**](docs/Auth0FgaApi.md#writeassertions) | **Put** /{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
-*Auth0FgaApi* | [**WriteAuthorizationModel**](docs/Auth0FgaApi.md#writeauthorizationmodel) | **Post** /{store_id}/authorization-models | Create a new authorization model
-*Auth0FgaApi* | [**WriteSettings**](docs/Auth0FgaApi.md#writesettings) | **Patch** /{store_id}/settings | Update the environment tag for a store
-*Auth0FgaApi* | [**WriteTokenIssuer**](docs/Auth0FgaApi.md#writetokenissuer) | **Post** /{store_id}/settings/token-issuers | Add 3rd party token issuer for Auth0 FGA read and write operations
+*Auth0FgaApi* | [**Check**](docs/Auth0FgaApi.md#check) | **Post** /stores/{store_id}/check | Check whether a user is authorized to access an object
+*Auth0FgaApi* | [**DeleteTokenIssuer**](docs/Auth0FgaApi.md#deletetokenissuer) | **Delete** /stores/{store_id}/settings/token-issuers/{id} | Remove 3rd party token issuer for Auth0 FGA read and write operation
+*Auth0FgaApi* | [**Expand**](docs/Auth0FgaApi.md#expand) | **Post** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
+*Auth0FgaApi* | [**Read**](docs/Auth0FgaApi.md#read) | **Post** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
+*Auth0FgaApi* | [**ReadAssertions**](docs/Auth0FgaApi.md#readassertions) | **Get** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
+*Auth0FgaApi* | [**ReadAuthorizationModel**](docs/Auth0FgaApi.md#readauthorizationmodel) | **Get** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
+*Auth0FgaApi* | [**ReadAuthorizationModels**](docs/Auth0FgaApi.md#readauthorizationmodels) | **Get** /stores/{store_id}/authorization-models | Return all the authorization model IDs for a particular store
+*Auth0FgaApi* | [**ReadSettings**](docs/Auth0FgaApi.md#readsettings) | **Get** /stores/{store_id}/settings | Return store settings, including the environment tag
+*Auth0FgaApi* | [**Write**](docs/Auth0FgaApi.md#write) | **Post** /stores/{store_id}/write | Add or delete tuples from the store
+*Auth0FgaApi* | [**WriteAssertions**](docs/Auth0FgaApi.md#writeassertions) | **Put** /stores/{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
+*Auth0FgaApi* | [**WriteAuthorizationModel**](docs/Auth0FgaApi.md#writeauthorizationmodel) | **Post** /stores/{store_id}/authorization-models | Create a new authorization model
+*Auth0FgaApi* | [**WriteSettings**](docs/Auth0FgaApi.md#writesettings) | **Patch** /stores/{store_id}/settings | Update the environment tag for a store
+*Auth0FgaApi* | [**WriteTokenIssuer**](docs/Auth0FgaApi.md#writetokenissuer) | **Post** /stores/{store_id}/settings/token-issuers | Add 3rd party token issuer for Auth0 FGA read and write operations
 
 
 ### Models
@@ -321,8 +321,6 @@ Class | Method | HTTP request | Description
  - [ReadRequestParams](docs/ReadRequestParams.md)
  - [ReadResponse](docs/ReadResponse.md)
  - [ReadSettingsResponse](docs/ReadSettingsResponse.md)
- - [ReadTuplesRequestParams](docs/ReadTuplesRequestParams.md)
- - [ReadTuplesResponse](docs/ReadTuplesResponse.md)
  - [Status](docs/Status.md)
  - [TokenIssuer](docs/TokenIssuer.md)
  - [Tuple](docs/Tuple.md)
