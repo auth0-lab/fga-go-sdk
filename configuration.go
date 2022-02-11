@@ -110,7 +110,7 @@ func NewConfiguration(userConfig UserConfiguration) (*Configuration, error) {
 		Host:           environmentConfig.Host,
 		Scheme:         environmentConfig.Scheme,
 		DefaultHeaders: make(map[string]string),
-		UserAgent:      strings.Replace("auth0-fga-sdk/go/{packageVersion}", "{packageVersion}", "0.0.1", -1),
+		UserAgent:      strings.Replace("auth0-fga-sdk/go/{packageVersion}", "{packageVersion}", "0.2.0", -1),
 		Debug:          false,
 		StoreId:        userConfig.StoreId,
 		ClientId:       userConfig.ClientId,

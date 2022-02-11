@@ -5,7 +5,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**Check**](Auth0FgaApi.md#Check) | **Post** /stores/{store_id}/check | Check whether a user is authorized to access an object
-[**DeleteTokenIssuer**](Auth0FgaApi.md#DeleteTokenIssuer) | **Delete** /stores/{store_id}/settings/token-issuers/{id} | Remove 3rd party token issuer for Auth0 FGA read and write operation
+[**DeleteTokenIssuer**](Auth0FgaApi.md#DeleteTokenIssuer) | **Delete** /stores/{store_id}/settings/token-issuers/{id} | Remove 3rd party token issuer for Auth0 FGA read and write operations
 [**Expand**](Auth0FgaApi.md#Expand) | **Post** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
 [**Read**](Auth0FgaApi.md#Read) | **Post** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 [**ReadAssertions**](Auth0FgaApi.md#ReadAssertions) | **Get** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
@@ -113,7 +113,7 @@ Name | Type | Description  | Notes
 
 > map[string]interface{} DeleteTokenIssuer(ctx, id).Execute()
 
-Remove 3rd party token issuer for Auth0 FGA read and write operation
+Remove 3rd party token issuer for Auth0 FGA read and write operations
 
 
 
