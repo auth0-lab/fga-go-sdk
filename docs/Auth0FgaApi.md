@@ -62,6 +62,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -151,6 +153,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -240,6 +244,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -329,6 +335,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -418,6 +426,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -507,6 +517,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -597,6 +609,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -686,6 +700,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -774,6 +790,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -864,6 +882,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -954,6 +974,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -1043,6 +1065,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:
@@ -1132,6 +1156,8 @@ func main() {
             // Handle authentication error
         case Auth0FgaApiValidationError:
             // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
         case Auth0FgaApiInternalError:
             // Handle API internal error
         case Auth0FgaApiRateLimitError:

@@ -234,7 +234,7 @@ body := auth0fga.ExpandRequestParams{
 }
 data, response, err := apiClient.Auth0FgaApi.Expand(context.Background()).Body(body).Execute()
 
-// data = { tree: {...} } // JSON
+// data = {"tree":{"root":{"name":"workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6#admin","leaf":{"users":{"users":["anne","beth"]}}}}} // JSON
 ```
 
 #### Read
@@ -279,6 +279,7 @@ data, response, err := apiClient.Auth0FgaApi.Read(context.Background()).Body(bod
 // data = {"tuples":[{"key":{"user":"...","relation":"...","object":"..."},"timestamp":"..."}]} // JSON
 ```
 
+
 ### API Endpoints
 
 Class | Method | HTTP request | Description
@@ -302,6 +303,8 @@ Class | Method | HTTP request | Description
 
  - [Any](docs/Any.md)
  - [Assertion](docs/Assertion.md)
+ - [AuthErrorCode](docs/AuthErrorCode.md)
+ - [AuthenticationErrorMessageResponse](docs/AuthenticationErrorMessageResponse.md)
  - [AuthorizationModel](docs/AuthorizationModel.md)
  - [AuthorizationmodelDifference](docs/AuthorizationmodelDifference.md)
  - [AuthorizationmodelTupleToUserset](docs/AuthorizationmodelTupleToUserset.md)
@@ -309,18 +312,25 @@ Class | Method | HTTP request | Description
  - [CheckResponse](docs/CheckResponse.md)
  - [Computed](docs/Computed.md)
  - [Environment](docs/Environment.md)
+ - [ErrorCode](docs/ErrorCode.md)
  - [ExpandRequestParams](docs/ExpandRequestParams.md)
  - [ExpandResponse](docs/ExpandResponse.md)
+ - [InternalErrorCode](docs/InternalErrorCode.md)
+ - [InternalErrorMessageResponse](docs/InternalErrorMessageResponse.md)
  - [Leaf](docs/Leaf.md)
  - [Node](docs/Node.md)
  - [Nodes](docs/Nodes.md)
+ - [NotFoundErrorCode](docs/NotFoundErrorCode.md)
  - [ObjectRelation](docs/ObjectRelation.md)
+ - [PathUnknownErrorMessageResponse](docs/PathUnknownErrorMessageResponse.md)
  - [ReadAssertionsResponse](docs/ReadAssertionsResponse.md)
  - [ReadAuthorizationModelResponse](docs/ReadAuthorizationModelResponse.md)
  - [ReadAuthorizationModelsResponse](docs/ReadAuthorizationModelsResponse.md)
  - [ReadRequestParams](docs/ReadRequestParams.md)
  - [ReadResponse](docs/ReadResponse.md)
  - [ReadSettingsResponse](docs/ReadSettingsResponse.md)
+ - [ResourceExhaustedErrorCode](docs/ResourceExhaustedErrorCode.md)
+ - [ResourceExhaustedErrorMessageResponse](docs/ResourceExhaustedErrorMessageResponse.md)
  - [Status](docs/Status.md)
  - [TokenIssuer](docs/TokenIssuer.md)
  - [Tuple](docs/Tuple.md)
@@ -334,6 +344,7 @@ Class | Method | HTTP request | Description
  - [UsersetTreeDifference](docs/UsersetTreeDifference.md)
  - [UsersetTreeTupleToUserset](docs/UsersetTreeTupleToUserset.md)
  - [Usersets](docs/Usersets.md)
+ - [ValidationErrorMessageResponse](docs/ValidationErrorMessageResponse.md)
  - [WriteAssertionsRequestParams](docs/WriteAssertionsRequestParams.md)
  - [WriteAuthorizationModelResponse](docs/WriteAuthorizationModelResponse.md)
  - [WriteRequestParams](docs/WriteRequestParams.md)

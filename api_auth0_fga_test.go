@@ -289,7 +289,7 @@ func TestAuth0FgaApi(t *testing.T) {
 	t.Run("WriteAuthorizationModel", func(t *testing.T) {
 		test := TestDefinition{
 			Name:           "WriteAuthorizationModel",
-			JsonResponse:   `{"id":"1uHxCSuTP0VKPYSnkq1pbb1jeZw"}`,
+			JsonResponse:   `{"authorization_model_id":"1uHxCSuTP0VKPYSnkq1pbb1jeZw"}`,
 			ResponseStatus: 200,
 			Method:         "POST",
 			RequestPath:    "authorization-models",
@@ -682,7 +682,11 @@ func TestAuth0FgaApi(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
-				return httpmock.NewStringResponse(400, ""), nil
+				errObj := ErrorResponse{
+					Code:    "validation_error",
+					Message: "Foo",
+				}
+				return httpmock.NewJsonResponse(400, errObj)
 			},
 		)
 		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
@@ -716,6 +720,11 @@ func TestAuth0FgaApi(t *testing.T) {
 			t.Errorf("Expected status code to be 400 but actual %d", validationError.ResponseStatusCode())
 			return
 		}
+
+		if validationError.ResponseCode() != VALIDATION_ERROR {
+			t.Errorf("Expected response code to be VALIDATION_ERROR but actual %s", validationError.ResponseCode())
+			return
+		}
 	})
 
 	t.Run("Check with 401 error", func(t *testing.T) {
@@ -744,7 +753,11 @@ func TestAuth0FgaApi(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
-				return httpmock.NewStringResponse(401, ""), nil
+				errObj := ErrorResponse{
+					Code:    "auth_failure",
+					Message: "Foo",
+				}
+				return httpmock.NewJsonResponse(401, errObj)
 			},
 		)
 		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
@@ -774,6 +787,82 @@ func TestAuth0FgaApi(t *testing.T) {
 			return
 		}
 
+		if authenticationError.ResponseCode() != AUTH_FAILURE {
+			t.Errorf("Expected response code to be AUTH_FAILURE but actual %s", authenticationError.ResponseCode())
+			return
+		}
+
+	})
+
+	t.Run("Check with 404 error", func(t *testing.T) {
+		test := TestDefinition{
+			Name:           "Check",
+			JsonResponse:   `{"allowed":true, "resolution":""}`,
+			ResponseStatus: 404,
+			Method:         "POST",
+			RequestPath:    "check",
+		}
+		requestBody := CheckRequestParams{
+			TupleKey: &TupleKey{
+				User:     PtrString("anne@auth0.com"),
+				Relation: PtrString("repo_reader"),
+				Object:   PtrString("github-repo:auth0/express-jwt"),
+			},
+		}
+
+		var expectedResponse CheckResponse
+		if err := json.Unmarshal([]byte(test.JsonResponse), &expectedResponse); err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+			func(req *http.Request) (*http.Response, error) {
+				errObj := ErrorResponse{
+					Code:    "undefined_endpoint",
+					Message: "Foo",
+				}
+				return httpmock.NewJsonResponse(404, errObj)
+			},
+		)
+		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		if err == nil {
+			t.Errorf("Expected error with 404 request but there is none")
+			return
+		}
+		notFoundError, ok := err.(Auth0FgaApiNotFoundError)
+		if !ok {
+			t.Errorf("Expected not found Error but type is incorrect %v", err)
+			return
+		}
+		// Do some basic validation of the error itself
+
+		if notFoundError.StoreId() != configuration.StoreId {
+			t.Errorf("Expected store id to be %s but actual %s", configuration.StoreId, notFoundError.StoreId())
+			return
+		}
+
+		if notFoundError.EndpointCategory() != "Check" {
+			t.Errorf("Expected category to be Check but actual %s", notFoundError.EndpointCategory())
+			return
+		}
+
+		if notFoundError.RequestMethod() != "POST" {
+			t.Errorf("Expected category to be POST but actual %s", notFoundError.RequestMethod())
+			return
+		}
+
+		if notFoundError.ResponseStatusCode() != 404 {
+			t.Errorf("Expected status code to be 404 but actual %d", notFoundError.ResponseStatusCode())
+			return
+		}
+
+		if notFoundError.ResponseCode() != UNDEFINED_ENDPOINT {
+			t.Errorf("Expected response code to be UNDEFINED_ENDPOINT but actual %s", notFoundError.ResponseCode())
+			return
+		}
 	})
 
 	t.Run("Check with 429 error", func(t *testing.T) {
@@ -802,7 +891,11 @@ func TestAuth0FgaApi(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
-				return httpmock.NewStringResponse(429, ""), nil
+				errObj := ErrorResponse{
+					Code:    "rate_limit_exceeded",
+					Message: "Foo",
+				}
+				return httpmock.NewJsonResponse(429, errObj)
 			},
 		)
 
@@ -848,6 +941,11 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		if rateLimitError.ResponseStatusCode() != 429 {
 			t.Errorf("Expected status code to be 429 but actual %d", rateLimitError.ResponseStatusCode())
+			return
+		}
+
+		if rateLimitError.ResponseCode() != RATE_LIMIT_EXCEEDED {
+			t.Errorf("Expected response code to be RATE_LIMIT_EXCEEDED but actual %s", rateLimitError.ResponseCode())
 			return
 		}
 
@@ -949,7 +1047,11 @@ func TestAuth0FgaApi(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
 			func(req *http.Request) (*http.Response, error) {
-				return httpmock.NewStringResponse(500, ""), nil
+				errObj := ErrorResponse{
+					Code:    "internal_error",
+					Message: "Foo",
+				}
+				return httpmock.NewJsonResponse(500, errObj)
 			},
 		)
 		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
@@ -981,6 +1083,11 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		if internalError.ResponseStatusCode() != 500 {
 			t.Errorf("Expected status code to be 500 but actual %d", internalError.ResponseStatusCode())
+			return
+		}
+
+		if internalError.ResponseCode() != INTERNAL_ERROR {
+			t.Errorf("Expected response code to be INTERNAL_ERROR but actual %s", internalError.ResponseCode())
 			return
 		}
 	})

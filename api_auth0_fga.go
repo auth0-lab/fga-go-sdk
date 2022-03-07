@@ -21,7 +21,6 @@ import (
 	_rand "math/rand"
 	_nethttp "net/http"
 	_neturl "net/url"
-	_strconv "strconv"
 	"strings"
 	"time"
 )
@@ -46,9 +45,9 @@ type Auth0FgaApi interface {
 	```json
 	{
 	  "tuple_key": {
-	    "user": "anne@auth0.com"
+	    "user": "anne@auth0.com",
 	    "relation": "owner"
-	    "object": "document:2021-budget",
+	    "object": "document:2021-budget"
 	  }
 	}
 	```
@@ -166,9 +165,9 @@ type Auth0FgaApi interface {
 	```json
 	{
 	 "tuple_key": {
-	     "user": "bob@auth0.com"
+	     "user": "bob@auth0.com",
 	     "relation": "reader",
-	     "object": "document:",
+	     "object": "document:"
 	  }
 	}
 	```
@@ -204,9 +203,9 @@ type Auth0FgaApi interface {
 	  "tuples": [
 	    {
 	      "key": {
-	        "user": "bob@auth0.com"
+	        "user": "bob@auth0.com",
 	        "relation": "reader",
-	        "object": "document:2021-budget",
+	        "object": "document:2021-budget"
 	      },
 	      "timestamp": "2021-10-06T15:32:11.128Z"
 	    }
@@ -229,17 +228,17 @@ type Auth0FgaApi interface {
 	  "tuples": [
 	    {
 	      "key": {
-	        "user": "anne@auth0.com"
+	        "user": "anne@auth0.com",
 	        "relation": "writer",
-	        "object": "document:2021-budget",
+	        "object": "document:2021-budget"
 	      },
 	      "timestamp": "2021-10-05T13:42:12.356Z"
 	    },
 	    {
 	      "key": {
-	        "user": "bob@auth0.com"
+	        "user": "bob@auth0.com",
 	        "relation": "reader",
-	        "object": "document:2021-budget",
+	        "object": "document:2021-budget"
 	      },
 	      "timestamp": "2021-10-06T15:32:11.128Z"
 	    }
@@ -404,9 +403,9 @@ type Auth0FgaApi interface {
 		 * The POST write API will update the tuples for a certain store.  Tuples and type definitions allow Auth0 FGA to determine whether a relationship exists between an object and an user.
 	Path parameter `store_id` is required.  In the body, `writes` adds new tuples while `deletes` remove existing tuples.  `lock_tuple` is reserved for future use.
 	## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
-	- Each write API call allows at most **25** tuples.
+	- Each write API call allows at most **10** tuples.
 	- Each store has a limit of **50000** tuples.
-	- Each store has a limit of **1** write requests per second (RPS).
+	- Each store has a limit of **3** write requests per second (RPS).
 	## Example
 	### Adding relationships
 	To add `anne@auth0.com` as a `writer` for `document:2021-budget`, call write API with the following
@@ -415,9 +414,9 @@ type Auth0FgaApi interface {
 	  "writes": {
 	    "tuple_keys": [
 	      {
-	        "user": "anne@auth0.com"
+	        "user": "anne@auth0.com",
 	        "relation": "writer",
-	        "object": "document:2021-budget",
+	        "object": "document:2021-budget"
 	      }
 	    ]
 	  }
@@ -430,9 +429,9 @@ type Auth0FgaApi interface {
 	  "deletes": {
 	    "tuple_keys": [
 	      {
-	        "user": "bob@auth0.com"
+	        "user": "bob@auth0.com",
 	        "relation": "reader",
-	        "object": "document:2021-budget",
+	        "object": "document:2021-budget"
 	      }
 	    ]
 	  }
@@ -626,9 +625,9 @@ In order to check if user `anne@auth0.com` has an owner relationship with object
 ```json
 {
   "tuple_key": {
-    "user": "anne@auth0.com"
+    "user": "anne@auth0.com",
     "relation": "owner"
-    "object": "document:2021-budget",
+    "object": "document:2021-budget"
   }
 }
 ```
@@ -727,21 +726,23 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "Check validation error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -750,16 +751,45 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "Check authentication error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "Check",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "Check validation error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -783,17 +813,19 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 				newErr.error = "Check rate limit error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("Check")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -809,15 +841,17 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "Check internal error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -832,15 +866,17 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "Check error for " + localVarHTTPMethod + " Check with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -969,21 +1005,23 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "DeleteTokenIssuer validation error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -992,16 +1030,45 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "DeleteTokenIssuer authentication error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "DeleteTokenIssuer",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "DeleteTokenIssuer validation error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -1025,17 +1092,19 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 				newErr.error = "DeleteTokenIssuer rate limit error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("DeleteTokenIssuer")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -1051,15 +1120,17 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "DeleteTokenIssuer internal error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -1074,15 +1145,17 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "DeleteTokenIssuer error for " + localVarHTTPMethod + " DeleteTokenIssuer with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -1272,21 +1345,23 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "Expand validation error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -1295,16 +1370,45 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "Expand authentication error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "Expand",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "Expand validation error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -1328,17 +1432,19 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 				newErr.error = "Expand rate limit error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("Expand")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -1354,15 +1460,17 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "Expand internal error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -1377,15 +1485,17 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "Expand error for " + localVarHTTPMethod + " Expand with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -1437,9 +1547,9 @@ To query for all objects that `bob@auth0.com` has `reader` relationship in the d
 ```json
 {
  "tuple_key": {
-     "user": "bob@auth0.com"
+     "user": "bob@auth0.com",
      "relation": "reader",
-     "object": "document:",
+     "object": "document:"
   }
 }
 ```
@@ -1475,9 +1585,9 @@ The API will return something like
   "tuples": [
     {
       "key": {
-        "user": "bob@auth0.com"
+        "user": "bob@auth0.com",
         "relation": "reader",
-        "object": "document:2021-budget",
+        "object": "document:2021-budget"
       },
       "timestamp": "2021-10-06T15:32:11.128Z"
     }
@@ -1500,17 +1610,17 @@ The API will return something like
   "tuples": [
     {
       "key": {
-        "user": "anne@auth0.com"
+        "user": "anne@auth0.com",
         "relation": "writer",
-        "object": "document:2021-budget",
+        "object": "document:2021-budget"
       },
       "timestamp": "2021-10-05T13:42:12.356Z"
     },
     {
       "key": {
-        "user": "bob@auth0.com"
+        "user": "bob@auth0.com",
         "relation": "reader",
-        "object": "document:2021-budget",
+        "object": "document:2021-budget"
       },
       "timestamp": "2021-10-06T15:32:11.128Z"
     }
@@ -1613,21 +1723,23 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "Read validation error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -1636,16 +1748,45 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "Read authentication error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "Read",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "Read validation error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -1669,17 +1810,19 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 				newErr.error = "Read rate limit error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("Read")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -1695,15 +1838,17 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "Read internal error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -1718,15 +1863,17 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "Read error for " + localVarHTTPMethod + " Read with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -1853,21 +2000,23 @@ func (a *Auth0FgaApiService) ReadAssertionsExecute(r ApiReadAssertionsRequest) (
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "ReadAssertions validation error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -1876,16 +2025,45 @@ func (a *Auth0FgaApiService) ReadAssertionsExecute(r ApiReadAssertionsRequest) (
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "ReadAssertions authentication error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "ReadAssertions",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "ReadAssertions validation error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -1909,17 +2087,19 @@ func (a *Auth0FgaApiService) ReadAssertionsExecute(r ApiReadAssertionsRequest) (
 				newErr.error = "ReadAssertions rate limit error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("ReadAssertions")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -1935,15 +2115,17 @@ func (a *Auth0FgaApiService) ReadAssertionsExecute(r ApiReadAssertionsRequest) (
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "ReadAssertions internal error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -1958,15 +2140,17 @@ func (a *Auth0FgaApiService) ReadAssertionsExecute(r ApiReadAssertionsRequest) (
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "ReadAssertions error for " + localVarHTTPMethod + " ReadAssertions with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -2133,21 +2317,23 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelExecute(r ApiReadAuthorizatio
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "ReadAuthorizationModel validation error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -2156,16 +2342,45 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelExecute(r ApiReadAuthorizatio
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "ReadAuthorizationModel authentication error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "ReadAuthorizationModel",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "ReadAuthorizationModel validation error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -2189,17 +2404,19 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelExecute(r ApiReadAuthorizatio
 				newErr.error = "ReadAuthorizationModel rate limit error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("ReadAuthorizationModel")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -2215,15 +2432,17 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelExecute(r ApiReadAuthorizatio
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "ReadAuthorizationModel internal error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -2238,15 +2457,17 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelExecute(r ApiReadAuthorizatio
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "ReadAuthorizationModel error for " + localVarHTTPMethod + " ReadAuthorizationModel with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -2413,21 +2634,23 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "ReadAuthorizationModels validation error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -2436,16 +2659,45 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "ReadAuthorizationModels authentication error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "ReadAuthorizationModels",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "ReadAuthorizationModels validation error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -2469,17 +2721,19 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 				newErr.error = "ReadAuthorizationModels rate limit error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("ReadAuthorizationModels")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -2495,15 +2749,17 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "ReadAuthorizationModels internal error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -2518,15 +2774,17 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "ReadAuthorizationModels error for " + localVarHTTPMethod + " ReadAuthorizationModels with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -2663,21 +2921,23 @@ func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Read
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "ReadSettings validation error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -2686,16 +2946,45 @@ func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Read
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "ReadSettings authentication error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "ReadSettings",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "ReadSettings validation error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -2719,17 +3008,19 @@ func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Read
 				newErr.error = "ReadSettings rate limit error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("ReadSettings")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -2745,15 +3036,17 @@ func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Read
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "ReadSettings internal error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -2768,15 +3061,17 @@ func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Read
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "ReadSettings error for " + localVarHTTPMethod + " ReadSettings with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -2818,9 +3113,9 @@ func (r ApiWriteRequest) Execute() (map[string]interface{}, *_nethttp.Response, 
  * The POST write API will update the tuples for a certain store.  Tuples and type definitions allow Auth0 FGA to determine whether a relationship exists between an object and an user.
 Path parameter `store_id` is required.  In the body, `writes` adds new tuples while `deletes` remove existing tuples.  `lock_tuple` is reserved for future use.
 ## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
-- Each write API call allows at most **25** tuples.
+- Each write API call allows at most **10** tuples.
 - Each store has a limit of **50000** tuples.
-- Each store has a limit of **1** write requests per second (RPS).
+- Each store has a limit of **3** write requests per second (RPS).
 ## Example
 ### Adding relationships
 To add `anne@auth0.com` as a `writer` for `document:2021-budget`, call write API with the following
@@ -2829,9 +3124,9 @@ To add `anne@auth0.com` as a `writer` for `document:2021-budget`, call write API
   "writes": {
     "tuple_keys": [
       {
-        "user": "anne@auth0.com"
+        "user": "anne@auth0.com",
         "relation": "writer",
-        "object": "document:2021-budget",
+        "object": "document:2021-budget"
       }
     ]
   }
@@ -2844,9 +3139,9 @@ To remove `bob@auth0.com` as a `reader` for `document:2021-budget`, call write A
   "deletes": {
     "tuple_keys": [
       {
-        "user": "bob@auth0.com"
+        "user": "bob@auth0.com",
         "relation": "reader",
-        "object": "document:2021-budget",
+        "object": "document:2021-budget"
       }
     ]
   }
@@ -2947,21 +3242,23 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "Write validation error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -2970,16 +3267,45 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "Write authentication error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "Write",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "Write validation error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -3003,17 +3329,19 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 				newErr.error = "Write rate limit error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("Write")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -3029,15 +3357,17 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "Write internal error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -3052,15 +3382,17 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "Write error for " + localVarHTTPMethod + " Write with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -3198,21 +3530,23 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "WriteAssertions validation error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -3221,16 +3555,45 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "WriteAssertions authentication error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "WriteAssertions",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "WriteAssertions validation error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -3254,17 +3617,19 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 				newErr.error = "WriteAssertions rate limit error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("WriteAssertions")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -3280,15 +3645,17 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "WriteAssertions internal error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -3303,15 +3670,17 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "WriteAssertions error for " + localVarHTTPMethod + " WriteAssertions with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -3491,21 +3860,23 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "WriteAuthorizationModel validation error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -3514,16 +3885,45 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "WriteAuthorizationModel authentication error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "WriteAuthorizationModel",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "WriteAuthorizationModel validation error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -3547,17 +3947,19 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 				newErr.error = "WriteAuthorizationModel rate limit error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("WriteAuthorizationModel")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -3573,15 +3975,17 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "WriteAuthorizationModel internal error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -3596,15 +4000,17 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "WriteAuthorizationModel error for " + localVarHTTPMethod + " WriteAuthorizationModel with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -3747,21 +4153,23 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Wr
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "WriteSettings validation error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -3770,16 +4178,45 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Wr
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "WriteSettings authentication error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "WriteSettings",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "WriteSettings validation error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -3803,17 +4240,19 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Wr
 				newErr.error = "WriteSettings rate limit error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("WriteSettings")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -3829,15 +4268,17 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Wr
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "WriteSettings internal error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -3852,15 +4293,17 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Wr
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "WriteSettings error for " + localVarHTTPMethod + " WriteSettings with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -4006,21 +4449,23 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
-
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "WriteTokenIssuer validation error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
-				var v Status
+				var v ValidationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
-			if localVarHTTPResponse.StatusCode == 401 {
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
 				newErr := Auth0FgaApiAuthenticationError{
 					body: localVarBody,
 
@@ -4029,16 +4474,45 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 					responseStatusCode: localVarHTTPResponse.StatusCode,
 					responseHeader:     localVarHTTPResponse.Header,
 				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.error = "WriteTokenIssuer authentication error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
 
-				var v Status
+				var v AuthenticationErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "WriteTokenIssuer",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "WriteTokenIssuer validation error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -4062,17 +4536,19 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 				newErr.error = "WriteTokenIssuer rate limit error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
 
 				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
 				newErr.rateUnit = getMaximumRateUnit("WriteTokenIssuer")
 				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
-				var v Status
+				var v ResourceExhaustedErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 
@@ -4088,15 +4564,17 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 					responseHeader:     localVarHTTPResponse.Header,
 				}
 				newErr.error = "WriteTokenIssuer internal error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-				var v Status
+				var v InternalErrorMessageResponse
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
 					return localVarReturnValue, localVarHTTPResponse, newErr
 				}
 				newErr.model = v
-				newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
@@ -4111,15 +4589,17 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 				responseHeader:     localVarHTTPResponse.Header,
 			}
 			newErr.error = "WriteTokenIssuer error for " + localVarHTTPMethod + " WriteTokenIssuer with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
 
-			var v Status
+			var v ErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			newErr.error += " with error code " + _strconv.Itoa(int(v.GetCode())) + " error message: " + v.GetMessage()
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}

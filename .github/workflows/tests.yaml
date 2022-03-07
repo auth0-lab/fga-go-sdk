@@ -33,3 +33,8 @@ jobs:
       uses: fossa-contrib/fossa-action@v1
       with:
         fossa-api-key: ${{ secrets.FOSSA_API_KEY }}
+
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/golang@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}

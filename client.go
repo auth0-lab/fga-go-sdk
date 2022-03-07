@@ -43,6 +43,13 @@ var (
 	xmlCheck  = regexp.MustCompile(`(?i:(?:application|text)/xml)`)
 )
 
+// ErrorResponse defines the erorr that will be asserted by FGA API.
+// This will only be used for error that is not defined
+type ErrorResponse struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
 // APIClient manages communication with the Auth0 Fine Grained Authorization (FGA) API v0.1
 // In most cases there should be only one, shared, APIClient.
 type APIClient struct {
@@ -538,6 +545,8 @@ type Auth0FgaApiAuthenticationError struct {
 	modelDecodeError   error
 	responseStatusCode int
 	responseHeader     http.Header
+	requestId          string
+	responseCode       AuthErrorCode
 }
 
 // Error returns non-empty string if there was an error.
@@ -570,7 +579,7 @@ func (e Auth0FgaApiAuthenticationError) ModelDecodeError() error {
 	return e.modelDecodeError
 }
 
-// ResponseStatusCode returns the original API response status code
+// ResponseStatusCode returns the original API response status HTTP code
 func (e Auth0FgaApiAuthenticationError) ResponseStatusCode() int {
 	return e.responseStatusCode
 }
@@ -578,6 +587,16 @@ func (e Auth0FgaApiAuthenticationError) ResponseStatusCode() int {
 // ResponseHeader returns the original API response header
 func (e Auth0FgaApiAuthenticationError) ResponseHeader() http.Header {
 	return e.responseHeader
+}
+
+// RequestId returns the FGA request ID associated with the response
+func (e Auth0FgaApiAuthenticationError) RequestId() string {
+	return e.requestId
+}
+
+// ResponseCode returns response code
+func (e Auth0FgaApiAuthenticationError) ResponseCode() AuthErrorCode {
+	return e.responseCode
 }
 
 // Auth0FgaApiError will be returned if there are errors in the API
@@ -594,6 +613,8 @@ type Auth0FgaApiError struct {
 	modelDecodeError   error
 	responseStatusCode int
 	responseHeader     http.Header
+	requestId          string
+	responseCode       string
 }
 
 // Error returns non-empty string if there was an error.
@@ -636,7 +657,7 @@ func (e Auth0FgaApiError) ModelDecodeError() error {
 	return e.modelDecodeError
 }
 
-// ResponseStatusCode returns the original API response status code
+// ResponseStatusCode returns the original API response HTTP status code
 func (e Auth0FgaApiError) ResponseStatusCode() int {
 	return e.responseStatusCode
 }
@@ -644,6 +665,16 @@ func (e Auth0FgaApiError) ResponseStatusCode() int {
 // ResponseHeader returns the original API response header
 func (e Auth0FgaApiError) ResponseHeader() http.Header {
 	return e.responseHeader
+}
+
+// RequestId returns the FGA request ID associated with the response
+func (e Auth0FgaApiError) RequestId() string {
+	return e.requestId
+}
+
+// ResponseCode returns response code
+func (e Auth0FgaApiError) ResponseCode() string {
+	return e.responseCode
 }
 
 // Auth0FgaApiValidationError will be returned if there are errors in the API's parameters
@@ -660,6 +691,8 @@ type Auth0FgaApiValidationError struct {
 	modelDecodeError   error
 	responseStatusCode int
 	responseHeader     http.Header
+	requestId          string
+	responseCode       ErrorCode
 }
 
 // Error returns non-empty string if there was an error.
@@ -702,7 +735,7 @@ func (e Auth0FgaApiValidationError) ModelDecodeError() error {
 	return e.modelDecodeError
 }
 
-// ResponseStatusCode returns the original API response status code
+// ResponseStatusCode returns the original API response HTTP status code
 func (e Auth0FgaApiValidationError) ResponseStatusCode() int {
 	return e.responseStatusCode
 }
@@ -710,6 +743,94 @@ func (e Auth0FgaApiValidationError) ResponseStatusCode() int {
 // ResponseHeader returns the original API response header
 func (e Auth0FgaApiValidationError) ResponseHeader() http.Header {
 	return e.responseHeader
+}
+
+// RequestId returns the FGA request ID associated with the response
+func (e Auth0FgaApiValidationError) RequestId() string {
+	return e.requestId
+}
+
+// ResponseCode returns response code
+func (e Auth0FgaApiValidationError) ResponseCode() ErrorCode {
+	return e.responseCode
+}
+
+// Auth0FgaApiNotFoundError will be returned if the endpoint cannot be found
+
+type Auth0FgaApiNotFoundError struct {
+	body  []byte
+	error string
+	model interface{}
+
+	storeId            string
+	endpointCategory   string
+	requestBody        interface{}
+	requestMethod      string
+	modelDecodeError   error
+	responseStatusCode int
+	responseHeader     http.Header
+	requestId          string
+	responseCode       NotFoundErrorCode
+}
+
+// Error returns non-empty string if there was an error.
+func (e Auth0FgaApiNotFoundError) Error() string {
+	return e.error
+}
+
+// Body returns the raw bytes of the response
+func (e Auth0FgaApiNotFoundError) Body() []byte {
+	return e.body
+}
+
+// Model returns the unpacked model of the error
+func (e Auth0FgaApiNotFoundError) Model() interface{} {
+	return e.model
+}
+
+// StoreId returns the store ID for the API that causes the error
+func (e Auth0FgaApiNotFoundError) StoreId() string {
+	return e.storeId
+}
+
+// RequestBody returns the original request body
+func (e Auth0FgaApiNotFoundError) RequestBody() interface{} {
+	return e.requestBody
+}
+
+// RequestMethod returns the method calling the API
+func (e Auth0FgaApiNotFoundError) RequestMethod() string {
+	return e.requestMethod
+}
+
+// EndpointCategory returns the original API category
+func (e Auth0FgaApiNotFoundError) EndpointCategory() string {
+	return e.endpointCategory
+}
+
+// ModelDecodeError returns any error when decoding the unpacked model of the error
+func (e Auth0FgaApiNotFoundError) ModelDecodeError() error {
+	return e.modelDecodeError
+}
+
+// ResponseStatusCode returns the original API response HTTP status code
+func (e Auth0FgaApiNotFoundError) ResponseStatusCode() int {
+	return e.responseStatusCode
+}
+
+// ResponseHeader returns the original API response header
+func (e Auth0FgaApiNotFoundError) ResponseHeader() http.Header {
+	return e.responseHeader
+}
+
+// RequestId returns the FGA request ID associated with the response
+func (e Auth0FgaApiNotFoundError) RequestId() string {
+	return e.requestId
+}
+
+// ResponseCode returns response code
+func (e Auth0FgaApiNotFoundError) ResponseCode() NotFoundErrorCode {
+	return e.responseCode
 }
 
 // Auth0FgaApiInternalError will be returned if there are internal errors in the Auth0 FGA
@@ -726,6 +847,8 @@ type Auth0FgaApiInternalError struct {
 	modelDecodeError   error
 	responseStatusCode int
 	responseHeader     http.Header
+	requestId          string
+	responseCode       InternalErrorCode
 }
 
 // Error returns non-empty string if there was an error.
@@ -768,7 +891,7 @@ func (e Auth0FgaApiInternalError) ModelDecodeError() error {
 	return e.modelDecodeError
 }
 
-// ResponseStatusCode returns the original API response status code
+// ResponseStatusCode returns the original API response HTTP status code
 func (e Auth0FgaApiInternalError) ResponseStatusCode() int {
 	return e.responseStatusCode
 }
@@ -776,6 +899,16 @@ func (e Auth0FgaApiInternalError) ResponseStatusCode() int {
 // ResponseHeader returns the original API response header
 func (e Auth0FgaApiInternalError) ResponseHeader() http.Header {
 	return e.responseHeader
+}
+
+// RequestId returns the FGA request ID associated with the response
+func (e Auth0FgaApiInternalError) RequestId() string {
+	return e.requestId
+}
+
+// ResponseCode returns response code
+func (e Auth0FgaApiInternalError) ResponseCode() InternalErrorCode {
+	return e.responseCode
 }
 
 // Auth0FgaApiRateLimitError will be returned if error happens becuase API's calling rate exceed limit
@@ -792,6 +925,8 @@ type Auth0FgaApiRateLimitError struct {
 	modelDecodeError   error
 	responseStatusCode int
 	responseHeader     http.Header
+	requestId          string
+	responseCode       ResourceExhaustedErrorCode
 
 	rateLimit           int
 	rateUnit            string
@@ -853,7 +988,7 @@ func (e Auth0FgaApiRateLimitError) ModelDecodeError() error {
 	return e.modelDecodeError
 }
 
-// ResponseStatusCode returns the original API response status code
+// ResponseStatusCode returns the original API response HTTP status code
 func (e Auth0FgaApiRateLimitError) ResponseStatusCode() int {
 	return e.responseStatusCode
 }
@@ -861,4 +996,14 @@ func (e Auth0FgaApiRateLimitError) ResponseStatusCode() int {
 // ResponseHeader returns the original API response header
 func (e Auth0FgaApiRateLimitError) ResponseHeader() http.Header {
 	return e.responseHeader
+}
+
+// RequestId returns the FGA request ID associated with the response
+func (e Auth0FgaApiRateLimitError) RequestId() string {
+	return e.requestId
+}
+
+// ResponseCode returns response code
+func (e Auth0FgaApiRateLimitError) ResponseCode() ResourceExhaustedErrorCode {
+	return e.responseCode
 }
