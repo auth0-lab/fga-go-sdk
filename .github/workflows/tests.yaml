@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches:
+      - chore/fix-snyk-ci
       - main
       - "release/v[0-9]+.[0-9]+.[0-9]+"
   pull_request:
@@ -34,7 +35,15 @@ jobs:
       with:
         fossa-api-key: ${{ secrets.FOSSA_API_KEY }}
 
+    - name: Set up node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
     - name: Run Snyk to check for vulnerabilities
-      uses: snyk/actions/golang@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      run: |
+        npm install -g snyk
+        snyk auth $SNYK_TOKEN
+        snyk monitor
