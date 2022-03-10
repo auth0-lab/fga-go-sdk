@@ -113,7 +113,7 @@ Name | Type | Description  | Notes
 
 ## DeleteTokenIssuer
 
-> map[string]interface{} DeleteTokenIssuer(ctx, id).Execute()
+> DeleteTokenIssuer(ctx, id).Execute()
 
 Remove 3rd party token issuer for Auth0 FGA read and write operations
 
@@ -163,8 +163,6 @@ func main() {
             // Handle unknown/undefined error
         }
     }
-    // response from `DeleteTokenIssuer`: map[string]interface{}
-    fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.DeleteTokenIssuer`: %v\n", resp)
 }
 ```
 
@@ -186,7 +184,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**map[string]interface{}**
+ (empty response body)
 
 ### Authorization
 
@@ -841,7 +839,7 @@ Name | Type | Description  | Notes
 
 ## WriteAssertions
 
-> map[string]interface{} WriteAssertions(ctx, authorizationModelId).Body(body).Execute()
+> WriteAssertions(ctx, authorizationModelId).Body(body).Execute()
 
 Upsert assertions for an authorization model ID
 
@@ -892,8 +890,6 @@ func main() {
             // Handle unknown/undefined error
         }
     }
-    // response from `WriteAssertions`: map[string]interface{}
-    fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.WriteAssertions`: %v\n", resp)
 }
 ```
 
@@ -916,7 +912,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**map[string]interface{}**
+ (empty response body)
 
 ### Authorization
 

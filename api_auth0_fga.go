@@ -76,9 +76,8 @@ type Auth0FgaApi interface {
 
 	/*
 	 * DeleteTokenIssuerExecute executes the request
-	 * @return map[string]interface{}
 	 */
-	DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequest) (map[string]interface{}, *_nethttp.Response, error)
+	DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequest) (*_nethttp.Response, error)
 
 	/*
 		 * Expand Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
@@ -460,9 +459,8 @@ type Auth0FgaApi interface {
 
 	/*
 	 * WriteAssertionsExecute executes the request
-	 * @return map[string]interface{}
 	 */
-	WriteAssertionsExecute(r ApiWriteAssertionsRequest) (map[string]interface{}, *_nethttp.Response, error)
+	WriteAssertionsExecute(r ApiWriteAssertionsRequest) (*_nethttp.Response, error)
 
 	/*
 		 * WriteAuthorizationModel Create a new authorization model
@@ -892,8 +890,8 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue CheckResponse
 	// should never have reached this
+	var localVarReturnValue CheckResponse
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
@@ -904,7 +902,7 @@ type ApiDeleteTokenIssuerRequest struct {
 	id string
 }
 
-func (r ApiDeleteTokenIssuerRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
+func (r ApiDeleteTokenIssuerRequest) Execute() (*_nethttp.Response, error) {
 	return r.ApiService.DeleteTokenIssuerExecute(r)
 }
 
@@ -927,9 +925,8 @@ func (a *Auth0FgaApiService) DeleteTokenIssuer(ctx _context.Context, id string) 
 
 /*
  * Execute executes the request
- * @return map[string]interface{}
  */
-func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequest) (map[string]interface{}, *_nethttp.Response, error) {
+func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequest) (*_nethttp.Response, error) {
 	var maxRetry int
 	var minWaitInMs int
 
@@ -948,7 +945,6 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 			localVarFormFileName string
 			localVarFileName     string
 			localVarFileBytes    []byte
-			localVarReturnValue  map[string]interface{}
 		)
 
 		localVarPath := "/stores/{store_id}/settings/token-issuers/{id}"
@@ -978,19 +974,19 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 		}
 		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 		if err != nil {
-			return localVarReturnValue, nil, err
+			return nil, err
 		}
 
 		localVarHTTPResponse, err := a.client.callAPI(req)
 		if err != nil || localVarHTTPResponse == nil {
-			return localVarReturnValue, localVarHTTPResponse, err
+			return localVarHTTPResponse, err
 		}
 
 		localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 		localVarHTTPResponse.Body.Close()
 		localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
 		if err != nil {
-			return localVarReturnValue, localVarHTTPResponse, err
+			return localVarHTTPResponse, err
 		}
 
 		if localVarHTTPResponse.StatusCode >= 300 {
@@ -1012,13 +1008,13 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
-					return localVarReturnValue, localVarHTTPResponse, newErr
+					return localVarHTTPResponse, newErr
 				}
 				newErr.model = v
 				newErr.responseCode = v.GetCode()
 				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 
 			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
@@ -1038,13 +1034,13 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
-					return localVarReturnValue, localVarHTTPResponse, newErr
+					return localVarHTTPResponse, newErr
 				}
 				newErr.model = v
 				newErr.responseCode = v.GetCode()
 				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 
 			if localVarHTTPResponse.StatusCode == 404 {
@@ -1064,13 +1060,13 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
-					return localVarReturnValue, localVarHTTPResponse, newErr
+					return localVarHTTPResponse, newErr
 				}
 				newErr.model = v
 				newErr.responseCode = v.GetCode()
 				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 
 			if localVarHTTPResponse.StatusCode == 429 {
@@ -1100,12 +1096,12 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
-					return localVarReturnValue, localVarHTTPResponse, newErr
+					return localVarHTTPResponse, newErr
 				}
 				newErr.model = v
 				newErr.responseCode = v.GetCode()
 				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
@@ -1126,13 +1122,13 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
-					return localVarReturnValue, localVarHTTPResponse, newErr
+					return localVarHTTPResponse, newErr
 				}
 				newErr.model = v
 				newErr.responseCode = v.GetCode()
 				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 			newErr := Auth0FgaApiError{
 				body: localVarBody,
@@ -1151,29 +1147,19 @@ func (a *Auth0FgaApiService) DeleteTokenIssuerExecute(r ApiDeleteTokenIssuerRequ
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 			newErr.model = v
 			newErr.responseCode = v.Code
 			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
-			return localVarReturnValue, localVarHTTPResponse, newErr
+			return localVarHTTPResponse, newErr
 		}
 
-		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			newErr := GenericOpenAPIError{
-				body:  localVarBody,
-				error: err.Error(),
-			}
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-
-		return localVarReturnValue, localVarHTTPResponse, nil
+		return localVarHTTPResponse, nil
 	}
-	var localVarReturnValue map[string]interface{}
 	// should never have reached this
-	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
+	return nil, reportError("RateLimitError not handled properly")
 }
 
 type ApiExpandRequest struct {
@@ -1511,8 +1497,8 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue ExpandResponse
 	// should never have reached this
+	var localVarReturnValue ExpandResponse
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
@@ -1889,8 +1875,8 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue ReadResponse
 	// should never have reached this
+	var localVarReturnValue ReadResponse
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
@@ -2166,8 +2152,8 @@ func (a *Auth0FgaApiService) ReadAssertionsExecute(r ApiReadAssertionsRequest) (
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue ReadAssertionsResponse
 	// should never have reached this
+	var localVarReturnValue ReadAssertionsResponse
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
@@ -2483,8 +2469,8 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelExecute(r ApiReadAuthorizatio
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue ReadAuthorizationModelResponse
 	// should never have reached this
+	var localVarReturnValue ReadAuthorizationModelResponse
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
@@ -2800,8 +2786,8 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue ReadAuthorizationModelsResponse
 	// should never have reached this
+	var localVarReturnValue ReadAuthorizationModelsResponse
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
@@ -3087,8 +3073,8 @@ func (a *Auth0FgaApiService) ReadSettingsExecute(r ApiReadSettingsRequest) (Read
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue ReadSettingsResponse
 	// should never have reached this
+	var localVarReturnValue ReadSettingsResponse
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
@@ -3408,8 +3394,8 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue map[string]interface{}
 	// should never have reached this
+	var localVarReturnValue map[string]interface{}
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
@@ -3426,7 +3412,7 @@ func (r ApiWriteAssertionsRequest) Body(body WriteAssertionsRequestParams) ApiWr
 	return r
 }
 
-func (r ApiWriteAssertionsRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
+func (r ApiWriteAssertionsRequest) Execute() (*_nethttp.Response, error) {
 	return r.ApiService.WriteAssertionsExecute(r)
 }
 
@@ -3447,9 +3433,8 @@ func (a *Auth0FgaApiService) WriteAssertions(ctx _context.Context, authorization
 
 /*
  * Execute executes the request
- * @return map[string]interface{}
  */
-func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest) (map[string]interface{}, *_nethttp.Response, error) {
+func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest) (*_nethttp.Response, error) {
 	var maxRetry int
 	var minWaitInMs int
 
@@ -3468,7 +3453,6 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 			localVarFormFileName string
 			localVarFileName     string
 			localVarFileBytes    []byte
-			localVarReturnValue  map[string]interface{}
 		)
 
 		localVarPath := "/stores/{store_id}/assertions/{authorization_model_id}"
@@ -3479,7 +3463,7 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 		localVarQueryParams := _neturl.Values{}
 		localVarFormParams := _neturl.Values{}
 		if r.body == nil {
-			return localVarReturnValue, nil, reportError("body is required and must be specified")
+			return nil, reportError("body is required and must be specified")
 		}
 
 		// to determine the Content-Type header
@@ -3503,19 +3487,19 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 		localVarPostBody = r.body
 		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 		if err != nil {
-			return localVarReturnValue, nil, err
+			return nil, err
 		}
 
 		localVarHTTPResponse, err := a.client.callAPI(req)
 		if err != nil || localVarHTTPResponse == nil {
-			return localVarReturnValue, localVarHTTPResponse, err
+			return localVarHTTPResponse, err
 		}
 
 		localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 		localVarHTTPResponse.Body.Close()
 		localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
 		if err != nil {
-			return localVarReturnValue, localVarHTTPResponse, err
+			return localVarHTTPResponse, err
 		}
 
 		if localVarHTTPResponse.StatusCode >= 300 {
@@ -3537,13 +3521,13 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
-					return localVarReturnValue, localVarHTTPResponse, newErr
+					return localVarHTTPResponse, newErr
 				}
 				newErr.model = v
 				newErr.responseCode = v.GetCode()
 				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 
 			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
@@ -3563,13 +3547,13 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
-					return localVarReturnValue, localVarHTTPResponse, newErr
+					return localVarHTTPResponse, newErr
 				}
 				newErr.model = v
 				newErr.responseCode = v.GetCode()
 				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 
 			if localVarHTTPResponse.StatusCode == 404 {
@@ -3589,13 +3573,13 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
-					return localVarReturnValue, localVarHTTPResponse, newErr
+					return localVarHTTPResponse, newErr
 				}
 				newErr.model = v
 				newErr.responseCode = v.GetCode()
 				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 
 			if localVarHTTPResponse.StatusCode == 429 {
@@ -3625,12 +3609,12 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
-					return localVarReturnValue, localVarHTTPResponse, newErr
+					return localVarHTTPResponse, newErr
 				}
 				newErr.model = v
 				newErr.responseCode = v.GetCode()
 				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
@@ -3651,13 +3635,13 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 				if err != nil {
 					newErr.modelDecodeError = err
-					return localVarReturnValue, localVarHTTPResponse, newErr
+					return localVarHTTPResponse, newErr
 				}
 				newErr.model = v
 				newErr.responseCode = v.GetCode()
 				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
 
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 			newErr := Auth0FgaApiError{
 				body: localVarBody,
@@ -3676,29 +3660,19 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.modelDecodeError = err
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 			newErr.model = v
 			newErr.responseCode = v.Code
 			newErr.error += " with error code " + v.Code + " error message: " + v.Message
 
-			return localVarReturnValue, localVarHTTPResponse, newErr
+			return localVarHTTPResponse, newErr
 		}
 
-		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			newErr := GenericOpenAPIError{
-				body:  localVarBody,
-				error: err.Error(),
-			}
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-
-		return localVarReturnValue, localVarHTTPResponse, nil
+		return localVarHTTPResponse, nil
 	}
-	var localVarReturnValue map[string]interface{}
 	// should never have reached this
-	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
+	return nil, reportError("RateLimitError not handled properly")
 }
 
 type ApiWriteAuthorizationModelRequest struct {
@@ -4026,8 +4000,8 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue WriteAuthorizationModelResponse
 	// should never have reached this
+	var localVarReturnValue WriteAuthorizationModelResponse
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
@@ -4319,8 +4293,8 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Wr
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue WriteSettingsResponse
 	// should never have reached this
+	var localVarReturnValue WriteSettingsResponse
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
@@ -4615,7 +4589,7 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 
 		return localVarReturnValue, localVarHTTPResponse, nil
 	}
-	var localVarReturnValue WriteTokenIssuersResponse
 	// should never have reached this
+	var localVarReturnValue WriteTokenIssuersResponse
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
