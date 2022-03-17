@@ -19,18 +19,16 @@ import (
 
 // AuthorizationmodelDifference struct for AuthorizationmodelDifference
 type AuthorizationmodelDifference struct {
-	Base     Userset `json:"base"`
-	Subtract Userset `json:"subtract"`
+	Base     *Userset `json:"base,omitempty"`
+	Subtract *Userset `json:"subtract,omitempty"`
 }
 
 // NewAuthorizationmodelDifference instantiates a new AuthorizationmodelDifference object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewAuthorizationmodelDifference(base Userset, subtract Userset) *AuthorizationmodelDifference {
+func NewAuthorizationmodelDifference() *AuthorizationmodelDifference {
 	this := AuthorizationmodelDifference{}
-	this.Base = base
-	this.Subtract = subtract
 	return &this
 }
 
@@ -42,60 +40,76 @@ func NewAuthorizationmodelDifferenceWithDefaults() *AuthorizationmodelDifference
 	return &this
 }
 
-// GetBase returns the Base field value
+// GetBase returns the Base field value if set, zero value otherwise.
 func (o *AuthorizationmodelDifference) GetBase() Userset {
-	if o == nil {
+	if o == nil || o.Base == nil {
 		var ret Userset
 		return ret
 	}
-
-	return o.Base
+	return *o.Base
 }
 
-// GetBaseOk returns a tuple with the Base field value
+// GetBaseOk returns a tuple with the Base field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AuthorizationmodelDifference) GetBaseOk() (*Userset, bool) {
-	if o == nil {
+	if o == nil || o.Base == nil {
 		return nil, false
 	}
-	return &o.Base, true
+	return o.Base, true
 }
 
-// SetBase sets field value
+// HasBase returns a boolean if a field has been set.
+func (o *AuthorizationmodelDifference) HasBase() bool {
+	if o != nil && o.Base != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetBase gets a reference to the given Userset and assigns it to the Base field.
 func (o *AuthorizationmodelDifference) SetBase(v Userset) {
-	o.Base = v
+	o.Base = &v
 }
 
-// GetSubtract returns the Subtract field value
+// GetSubtract returns the Subtract field value if set, zero value otherwise.
 func (o *AuthorizationmodelDifference) GetSubtract() Userset {
-	if o == nil {
+	if o == nil || o.Subtract == nil {
 		var ret Userset
 		return ret
 	}
-
-	return o.Subtract
+	return *o.Subtract
 }
 
-// GetSubtractOk returns a tuple with the Subtract field value
+// GetSubtractOk returns a tuple with the Subtract field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AuthorizationmodelDifference) GetSubtractOk() (*Userset, bool) {
-	if o == nil {
+	if o == nil || o.Subtract == nil {
 		return nil, false
 	}
-	return &o.Subtract, true
+	return o.Subtract, true
 }
 
-// SetSubtract sets field value
+// HasSubtract returns a boolean if a field has been set.
+func (o *AuthorizationmodelDifference) HasSubtract() bool {
+	if o != nil && o.Subtract != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSubtract gets a reference to the given Userset and assigns it to the Subtract field.
 func (o *AuthorizationmodelDifference) SetSubtract(v Userset) {
-	o.Subtract = v
+	o.Subtract = &v
 }
 
 func (o AuthorizationmodelDifference) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if true {
+	if o.Base != nil {
 		toSerialize["base"] = o.Base
 	}
-	if true {
+	if o.Subtract != nil {
 		toSerialize["subtract"] = o.Subtract
 	}
 	return json.Marshal(toSerialize)

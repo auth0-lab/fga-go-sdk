@@ -20,9 +20,9 @@ import (
 
 // TupleChange struct for TupleChange
 type TupleChange struct {
-	TupleKey  *TupleKey  `json:"tuple_key,omitempty"`
-	Operation *string    `json:"operation,omitempty"`
-	Timestamp *time.Time `json:"timestamp,omitempty"`
+	TupleKey  *TupleKey       `json:"tuple_key,omitempty"`
+	Operation *TupleOperation `json:"operation,omitempty"`
+	Timestamp *time.Time      `json:"timestamp,omitempty"`
 }
 
 // NewTupleChange instantiates a new TupleChange object
@@ -31,6 +31,8 @@ type TupleChange struct {
 // will change when the set of required properties is changed
 func NewTupleChange() *TupleChange {
 	this := TupleChange{}
+	var operation TupleOperation = WRITE
+	this.Operation = &operation
 	return &this
 }
 
@@ -39,6 +41,8 @@ func NewTupleChange() *TupleChange {
 // but it doesn't guarantee that properties required by API are set
 func NewTupleChangeWithDefaults() *TupleChange {
 	this := TupleChange{}
+	var operation TupleOperation = WRITE
+	this.Operation = &operation
 	return &this
 }
 
@@ -75,9 +79,9 @@ func (o *TupleChange) SetTupleKey(v TupleKey) {
 }
 
 // GetOperation returns the Operation field value if set, zero value otherwise.
-func (o *TupleChange) GetOperation() string {
+func (o *TupleChange) GetOperation() TupleOperation {
 	if o == nil || o.Operation == nil {
-		var ret string
+		var ret TupleOperation
 		return ret
 	}
 	return *o.Operation
@@ -85,7 +89,7 @@ func (o *TupleChange) GetOperation() string {
 
 // GetOperationOk returns a tuple with the Operation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TupleChange) GetOperationOk() (*string, bool) {
+func (o *TupleChange) GetOperationOk() (*TupleOperation, bool) {
 	if o == nil || o.Operation == nil {
 		return nil, false
 	}
@@ -101,8 +105,8 @@ func (o *TupleChange) HasOperation() bool {
 	return false
 }
 
-// SetOperation gets a reference to the given string and assigns it to the Operation field.
-func (o *TupleChange) SetOperation(v string) {
+// SetOperation gets a reference to the given TupleOperation and assigns it to the Operation field.
+func (o *TupleChange) SetOperation(v TupleOperation) {
 	o.Operation = &v
 }
 

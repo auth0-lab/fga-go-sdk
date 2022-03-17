@@ -39,14 +39,14 @@ type Auth0FgaApi interface {
 	The response will return whether the relationship exists in the field `allowed`.
 
 	## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
-	- Each store has a limit of **25** check requests per second (RPS).
+	- Each store has a limit of **300** check requests per second (RPS).
 	## Example
 	In order to check if user `anne@auth0.com` has an owner relationship with object document:2021-budget, a check API call should be fired with the following body
 	```json
 	{
 	  "tuple_key": {
 	    "user": "anne@auth0.com",
-	    "relation": "owner"
+	    "relation": "owner",
 	    "object": "document:2021-budget"
 	  }
 	}
@@ -157,7 +157,7 @@ type Auth0FgaApi interface {
 	1. Object is mandatory. An object can be a full object (e.g., `type:object_id`) or type only (e.g., `type:`).
 	2. User is mandatory in the case the object is type only.
 	## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
-	- Each store has a limit of **5** read requests per second (RPS).
+	- Each store has a limit of **25** read requests per second (RPS).
 	## Examples
 	### Query for all objects in a type definition
 	To query for all objects that `bob@auth0.com` has `reader` relationship in the document type definition, call read API with body of
@@ -369,6 +369,22 @@ type Auth0FgaApi interface {
 	ReadAuthorizationModelsExecute(r ApiReadAuthorizationModelsRequest) (ReadAuthorizationModelsResponse, *_nethttp.Response, error)
 
 	/*
+		 * ReadChanges Return a list of all the tuple changes
+		 * The GET changes API will return a paginated list of tuple changes (additions and deletions) that occurred in a given store, sorted by ascending time. The response will include a continuation token that is used to get the next set of changes. If there are no changes after the provided continuation token, the same token will be returned in order for it to be used when new changes are recorded. If the store never had any tuples added or removed, this token will be empty.
+	You can use the `type` parameter to only get the list of tuple changes that affect objects of that type.
+	Each store has a limit of **5** requests per second (RPS).
+		 * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+		 * @return ApiReadChangesRequest
+	*/
+	ReadChanges(ctx _context.Context) ApiReadChangesRequest
+
+	/*
+	 * ReadChangesExecute executes the request
+	 * @return ReadChangesResponse
+	 */
+	ReadChangesExecute(r ApiReadChangesRequest) (ReadChangesResponse, *_nethttp.Response, error)
+
+	/*
 		 * ReadSettings Return store settings, including the environment tag
 		 * The GET settings API will return the store's settings, including environment tag and an array of Auth0 FGA's allowed 3rd party token issuers. The environment tag is used to differentiate between development, staging, and production environments.
 	Path parameter `store_id` is required.
@@ -404,7 +420,7 @@ type Auth0FgaApi interface {
 	## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
 	- Each write API call allows at most **10** tuples.
 	- Each store has a limit of **50000** tuples.
-	- Each store has a limit of **3** write requests per second (RPS).
+	- Each store has a limit of **20** write requests per second (RPS).
 	## Example
 	### Adding relationships
 	To add `anne@auth0.com` as a `writer` for `document:2021-budget`, call write API with the following
@@ -598,11 +614,11 @@ type ApiCheckRequest struct {
 	ctx        _context.Context
 	ApiService Auth0FgaApi
 
-	body *CheckRequestParams
+	params *CheckRequestParams
 }
 
-func (r ApiCheckRequest) Body(body CheckRequestParams) ApiCheckRequest {
-	r.body = &body
+func (r ApiCheckRequest) Params(params CheckRequestParams) ApiCheckRequest {
+	r.params = &params
 	return r
 }
 
@@ -617,14 +633,14 @@ Path parameter `store_id` as well as body parameter `object`, `relation` and `us
 The response will return whether the relationship exists in the field `allowed`.
 
 ## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
-- Each store has a limit of **25** check requests per second (RPS).
+- Each store has a limit of **300** check requests per second (RPS).
 ## Example
 In order to check if user `anne@auth0.com` has an owner relationship with object document:2021-budget, a check API call should be fired with the following body
 ```json
 {
   "tuple_key": {
     "user": "anne@auth0.com",
-    "relation": "owner"
+    "relation": "owner",
     "object": "document:2021-budget"
   }
 }
@@ -672,8 +688,8 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 		localVarHeaderParams := make(map[string]string)
 		localVarQueryParams := _neturl.Values{}
 		localVarFormParams := _neturl.Values{}
-		if r.body == nil {
-			return localVarReturnValue, nil, reportError("body is required and must be specified")
+		if r.params == nil {
+			return localVarReturnValue, nil, reportError("params is required and must be specified")
 		}
 
 		// to determine the Content-Type header
@@ -694,7 +710,7 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 			localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 		}
 		// body params
-		localVarPostBody = r.body
+		localVarPostBody = r.params
 		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 		if err != nil {
 			return localVarReturnValue, nil, err
@@ -1166,11 +1182,11 @@ type ApiExpandRequest struct {
 	ctx        _context.Context
 	ApiService Auth0FgaApi
 
-	body *ExpandRequestParams
+	params *ExpandRequestParams
 }
 
-func (r ApiExpandRequest) Body(body ExpandRequestParams) ApiExpandRequest {
-	r.body = &body
+func (r ApiExpandRequest) Params(params ExpandRequestParams) ApiExpandRequest {
+	r.params = &params
 	return r
 }
 
@@ -1279,8 +1295,8 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 		localVarHeaderParams := make(map[string]string)
 		localVarQueryParams := _neturl.Values{}
 		localVarFormParams := _neturl.Values{}
-		if r.body == nil {
-			return localVarReturnValue, nil, reportError("body is required and must be specified")
+		if r.params == nil {
+			return localVarReturnValue, nil, reportError("params is required and must be specified")
 		}
 
 		// to determine the Content-Type header
@@ -1301,7 +1317,7 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 			localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 		}
 		// body params
-		localVarPostBody = r.body
+		localVarPostBody = r.params
 		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 		if err != nil {
 			return localVarReturnValue, nil, err
@@ -1506,11 +1522,11 @@ type ApiReadRequest struct {
 	ctx        _context.Context
 	ApiService Auth0FgaApi
 
-	body *ReadRequestParams
+	params *ReadRequestParams
 }
 
-func (r ApiReadRequest) Body(body ReadRequestParams) ApiReadRequest {
-	r.body = &body
+func (r ApiReadRequest) Params(params ReadRequestParams) ApiReadRequest {
+	r.params = &params
 	return r
 }
 
@@ -1526,7 +1542,7 @@ It does not expand or traverse the graph by taking the authorization model into 
 1. Object is mandatory. An object can be a full object (e.g., `type:object_id`) or type only (e.g., `type:`).
 2. User is mandatory in the case the object is type only.
 ## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
-- Each store has a limit of **5** read requests per second (RPS).
+- Each store has a limit of **25** read requests per second (RPS).
 ## Examples
 ### Query for all objects in a type definition
 To query for all objects that `bob@auth0.com` has `reader` relationship in the document type definition, call read API with body of
@@ -1657,8 +1673,8 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 		localVarHeaderParams := make(map[string]string)
 		localVarQueryParams := _neturl.Values{}
 		localVarFormParams := _neturl.Values{}
-		if r.body == nil {
-			return localVarReturnValue, nil, reportError("body is required and must be specified")
+		if r.params == nil {
+			return localVarReturnValue, nil, reportError("params is required and must be specified")
 		}
 
 		// to determine the Content-Type header
@@ -1679,7 +1695,7 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 			localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 		}
 		// body params
-		localVarPostBody = r.body
+		localVarPostBody = r.params
 		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 		if err != nil {
 			return localVarReturnValue, nil, err
@@ -2791,6 +2807,306 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
 }
 
+type ApiReadChangesRequest struct {
+	ctx        _context.Context
+	ApiService Auth0FgaApi
+
+	type_             *string
+	pageSize          *int32
+	continuationToken *string
+}
+
+func (r ApiReadChangesRequest) Type_(type_ string) ApiReadChangesRequest {
+	r.type_ = &type_
+	return r
+}
+func (r ApiReadChangesRequest) PageSize(pageSize int32) ApiReadChangesRequest {
+	r.pageSize = &pageSize
+	return r
+}
+func (r ApiReadChangesRequest) ContinuationToken(continuationToken string) ApiReadChangesRequest {
+	r.continuationToken = &continuationToken
+	return r
+}
+
+func (r ApiReadChangesRequest) Execute() (ReadChangesResponse, *_nethttp.Response, error) {
+	return r.ApiService.ReadChangesExecute(r)
+}
+
+/*
+ * ReadChanges Return a list of all the tuple changes
+ * The GET changes API will return a paginated list of tuple changes (additions and deletions) that occurred in a given store, sorted by ascending time. The response will include a continuation token that is used to get the next set of changes. If there are no changes after the provided continuation token, the same token will be returned in order for it to be used when new changes are recorded. If the store never had any tuples added or removed, this token will be empty.
+You can use the `type` parameter to only get the list of tuple changes that affect objects of that type.
+Each store has a limit of **5** requests per second (RPS).
+ * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @return ApiReadChangesRequest
+*/
+func (a *Auth0FgaApiService) ReadChanges(ctx _context.Context) ApiReadChangesRequest {
+	return ApiReadChangesRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+/*
+ * Execute executes the request
+ * @return ReadChangesResponse
+ */
+func (a *Auth0FgaApiService) ReadChangesExecute(r ApiReadChangesRequest) (ReadChangesResponse, *_nethttp.Response, error) {
+	var maxRetry int
+	var minWaitInMs int
+
+	if a.RetryParams != nil {
+		maxRetry = a.RetryParams.MinWaitInMs
+		minWaitInMs = a.RetryParams.MinWaitInMs
+	} else {
+		maxRetry = 0
+		minWaitInMs = 0
+	}
+
+	for i := 0; i < maxRetry+1; i++ {
+		var (
+			localVarHTTPMethod   = _nethttp.MethodGet
+			localVarPostBody     interface{}
+			localVarFormFileName string
+			localVarFileName     string
+			localVarFileBytes    []byte
+			localVarReturnValue  ReadChangesResponse
+		)
+
+		localVarPath := "/stores/{store_id}/changes"
+		localVarPath = strings.Replace(localVarPath, "{"+"store_id"+"}", _neturl.PathEscape(a.client.cfg.StoreId), -1)
+
+		localVarHeaderParams := make(map[string]string)
+		localVarQueryParams := _neturl.Values{}
+		localVarFormParams := _neturl.Values{}
+
+		if r.type_ != nil {
+			localVarQueryParams.Add("type", parameterToString(*r.type_, ""))
+		}
+		if r.pageSize != nil {
+			localVarQueryParams.Add("page_size", parameterToString(*r.pageSize, ""))
+		}
+		if r.continuationToken != nil {
+			localVarQueryParams.Add("continuation_token", parameterToString(*r.continuationToken, ""))
+		}
+		// to determine the Content-Type header
+		localVarHTTPContentTypes := []string{}
+
+		// set Content-Type header
+		localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+		if localVarHTTPContentType != "" {
+			localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+		}
+
+		// to determine the Accept header
+		localVarHTTPHeaderAccepts := []string{"application/json"}
+
+		// set Accept header
+		localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+		if localVarHTTPHeaderAccept != "" {
+			localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+		}
+		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+		if err != nil {
+			return localVarReturnValue, nil, err
+		}
+
+		localVarHTTPResponse, err := a.client.callAPI(req)
+		if err != nil || localVarHTTPResponse == nil {
+			return localVarReturnValue, localVarHTTPResponse, err
+		}
+
+		localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+		localVarHTTPResponse.Body.Close()
+		localVarHTTPResponse.Body = _ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+		if err != nil {
+			return localVarReturnValue, localVarHTTPResponse, err
+		}
+
+		if localVarHTTPResponse.StatusCode >= 300 {
+
+			if localVarHTTPResponse.StatusCode == 400 || localVarHTTPResponse.StatusCode == 422 {
+				newErr := Auth0FgaApiValidationError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "ReadChanges",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "ReadChanges validation error for " + localVarHTTPMethod + " ReadChanges with body " + string(localVarBody)
+				var v ValidationErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 401 || localVarHTTPResponse.StatusCode == 403 {
+				newErr := Auth0FgaApiAuthenticationError{
+					body: localVarBody,
+
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "ReadChanges",
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "ReadChanges authentication error for " + localVarHTTPMethod + " ReadChanges with body " + string(localVarBody)
+
+				var v AuthenticationErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 404 {
+				newErr := Auth0FgaApiNotFoundError{
+					body:               localVarBody,
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "ReadChanges",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.error = "ReadChanges validation error for " + localVarHTTPMethod + " ReadChanges with body " + string(localVarBody)
+				var v PathUnknownErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode == 429 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retry reached
+				newErr := Auth0FgaApiRateLimitError{
+					body: localVarBody,
+
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "ReadChanges",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				newErr.error = "ReadChanges rate limit error for " + localVarHTTPMethod + " ReadChanges with body " + string(localVarBody)
+
+				// Due to CanonicalHeaderKey, header name is case-insensitive.
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+				newErr.rateLimit, _ = atoi(localVarHTTPResponse.Header.Get("X-Ratelimit-Limit"))
+				newErr.rateUnit = getMaximumRateUnit("ReadChanges")
+				newErr.rateLimitResetEpoch = localVarHTTPResponse.Header.Get("X-Ratelimit-Reset")
+				var v ResourceExhaustedErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+
+			if localVarHTTPResponse.StatusCode >= 500 {
+				newErr := Auth0FgaApiInternalError{
+					body: localVarBody,
+
+					storeId:            a.client.cfg.StoreId,
+					endpointCategory:   "ReadChanges",
+					requestBody:        localVarPostBody,
+					requestMethod:      localVarHTTPMethod,
+					responseStatusCode: localVarHTTPResponse.StatusCode,
+					responseHeader:     localVarHTTPResponse.Header,
+				}
+				newErr.error = "ReadChanges internal error for " + localVarHTTPMethod + " ReadChanges with body " + string(localVarBody)
+				newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+
+				var v InternalErrorMessageResponse
+				err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+				if err != nil {
+					newErr.modelDecodeError = err
+					return localVarReturnValue, localVarHTTPResponse, newErr
+				}
+				newErr.model = v
+				newErr.responseCode = v.GetCode()
+				newErr.error += " with error code " + string(v.GetCode()) + " error message: " + v.GetMessage()
+
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr := Auth0FgaApiError{
+				body: localVarBody,
+
+				storeId:            a.client.cfg.StoreId,
+				endpointCategory:   "ReadChanges",
+				requestBody:        localVarPostBody,
+				requestMethod:      localVarHTTPMethod,
+				responseStatusCode: localVarHTTPResponse.StatusCode,
+				responseHeader:     localVarHTTPResponse.Header,
+			}
+			newErr.error = "ReadChanges error for " + localVarHTTPMethod + " ReadChanges with body " + string(localVarBody)
+			newErr.requestId = localVarHTTPResponse.Header.Get("Fga-Request-Id")
+
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.modelDecodeError = err
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			newErr.responseCode = v.Code
+			newErr.error += " with error code " + v.Code + " error message: " + v.Message
+
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr := GenericOpenAPIError{
+				body:  localVarBody,
+				error: err.Error(),
+			}
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+
+		return localVarReturnValue, localVarHTTPResponse, nil
+	}
+	// should never have reached this
+	var localVarReturnValue ReadChangesResponse
+	return localVarReturnValue, nil, reportError("RateLimitError not handled properly")
+}
+
 type ApiReadSettingsRequest struct {
 	ctx        _context.Context
 	ApiService Auth0FgaApi
@@ -3082,11 +3398,11 @@ type ApiWriteRequest struct {
 	ctx        _context.Context
 	ApiService Auth0FgaApi
 
-	body *WriteRequestParams
+	params *WriteRequestParams
 }
 
-func (r ApiWriteRequest) Body(body WriteRequestParams) ApiWriteRequest {
-	r.body = &body
+func (r ApiWriteRequest) Params(params WriteRequestParams) ApiWriteRequest {
+	r.params = &params
 	return r
 }
 
@@ -3101,7 +3417,7 @@ Path parameter `store_id` is required.  In the body, `writes` adds new tuples wh
 ## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
 - Each write API call allows at most **10** tuples.
 - Each store has a limit of **50000** tuples.
-- Each store has a limit of **3** write requests per second (RPS).
+- Each store has a limit of **20** write requests per second (RPS).
 ## Example
 ### Adding relationships
 To add `anne@auth0.com` as a `writer` for `document:2021-budget`, call write API with the following
@@ -3176,8 +3492,8 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 		localVarHeaderParams := make(map[string]string)
 		localVarQueryParams := _neturl.Values{}
 		localVarFormParams := _neturl.Values{}
-		if r.body == nil {
-			return localVarReturnValue, nil, reportError("body is required and must be specified")
+		if r.params == nil {
+			return localVarReturnValue, nil, reportError("params is required and must be specified")
 		}
 
 		// to determine the Content-Type header
@@ -3198,7 +3514,7 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 			localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 		}
 		// body params
-		localVarPostBody = r.body
+		localVarPostBody = r.params
 		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 		if err != nil {
 			return localVarReturnValue, nil, err
@@ -3404,11 +3720,11 @@ type ApiWriteAssertionsRequest struct {
 	ApiService Auth0FgaApi
 
 	authorizationModelId string
-	body                 *WriteAssertionsRequestParams
+	params               *WriteAssertionsRequestParams
 }
 
-func (r ApiWriteAssertionsRequest) Body(body WriteAssertionsRequestParams) ApiWriteAssertionsRequest {
-	r.body = &body
+func (r ApiWriteAssertionsRequest) Params(params WriteAssertionsRequestParams) ApiWriteAssertionsRequest {
+	r.params = &params
 	return r
 }
 
@@ -3462,8 +3778,8 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 		localVarHeaderParams := make(map[string]string)
 		localVarQueryParams := _neturl.Values{}
 		localVarFormParams := _neturl.Values{}
-		if r.body == nil {
-			return nil, reportError("body is required and must be specified")
+		if r.params == nil {
+			return nil, reportError("params is required and must be specified")
 		}
 
 		// to determine the Content-Type header
@@ -3484,7 +3800,7 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 			localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 		}
 		// body params
-		localVarPostBody = r.body
+		localVarPostBody = r.params
 		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 		if err != nil {
 			return nil, err
@@ -3679,11 +3995,11 @@ type ApiWriteAuthorizationModelRequest struct {
 	ctx        _context.Context
 	ApiService Auth0FgaApi
 
-	body *TypeDefinitions
+	typeDefinitions *TypeDefinitions
 }
 
-func (r ApiWriteAuthorizationModelRequest) Body(body TypeDefinitions) ApiWriteAuthorizationModelRequest {
-	r.body = &body
+func (r ApiWriteAuthorizationModelRequest) TypeDefinitions(typeDefinitions TypeDefinitions) ApiWriteAuthorizationModelRequest {
+	r.typeDefinitions = &typeDefinitions
 	return r
 }
 
@@ -3782,8 +4098,8 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 		localVarHeaderParams := make(map[string]string)
 		localVarQueryParams := _neturl.Values{}
 		localVarFormParams := _neturl.Values{}
-		if r.body == nil {
-			return localVarReturnValue, nil, reportError("body is required and must be specified")
+		if r.typeDefinitions == nil {
+			return localVarReturnValue, nil, reportError("typeDefinitions is required and must be specified")
 		}
 
 		// to determine the Content-Type header
@@ -3804,7 +4120,7 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 			localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 		}
 		// body params
-		localVarPostBody = r.body
+		localVarPostBody = r.typeDefinitions
 		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 		if err != nil {
 			return localVarReturnValue, nil, err
@@ -4009,11 +4325,11 @@ type ApiWriteSettingsRequest struct {
 	ctx        _context.Context
 	ApiService Auth0FgaApi
 
-	body *WriteSettingsRequestParams
+	params *WriteSettingsRequestParams
 }
 
-func (r ApiWriteSettingsRequest) Body(body WriteSettingsRequestParams) ApiWriteSettingsRequest {
-	r.body = &body
+func (r ApiWriteSettingsRequest) Params(params WriteSettingsRequestParams) ApiWriteSettingsRequest {
+	r.params = &params
 	return r
 }
 
@@ -4075,8 +4391,8 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Wr
 		localVarHeaderParams := make(map[string]string)
 		localVarQueryParams := _neturl.Values{}
 		localVarFormParams := _neturl.Values{}
-		if r.body == nil {
-			return localVarReturnValue, nil, reportError("body is required and must be specified")
+		if r.params == nil {
+			return localVarReturnValue, nil, reportError("params is required and must be specified")
 		}
 
 		// to determine the Content-Type header
@@ -4097,7 +4413,7 @@ func (a *Auth0FgaApiService) WriteSettingsExecute(r ApiWriteSettingsRequest) (Wr
 			localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 		}
 		// body params
-		localVarPostBody = r.body
+		localVarPostBody = r.params
 		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 		if err != nil {
 			return localVarReturnValue, nil, err
@@ -4302,11 +4618,11 @@ type ApiWriteTokenIssuerRequest struct {
 	ctx        _context.Context
 	ApiService Auth0FgaApi
 
-	body *WriteTokenIssuersRequestParams
+	params *WriteTokenIssuersRequestParams
 }
 
-func (r ApiWriteTokenIssuerRequest) Body(body WriteTokenIssuersRequestParams) ApiWriteTokenIssuerRequest {
-	r.body = &body
+func (r ApiWriteTokenIssuerRequest) Params(params WriteTokenIssuersRequestParams) ApiWriteTokenIssuerRequest {
+	r.params = &params
 	return r
 }
 
@@ -4371,8 +4687,8 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 		localVarHeaderParams := make(map[string]string)
 		localVarQueryParams := _neturl.Values{}
 		localVarFormParams := _neturl.Values{}
-		if r.body == nil {
-			return localVarReturnValue, nil, reportError("body is required and must be specified")
+		if r.params == nil {
+			return localVarReturnValue, nil, reportError("params is required and must be specified")
 		}
 
 		// to determine the Content-Type header
@@ -4393,7 +4709,7 @@ func (a *Auth0FgaApiService) WriteTokenIssuerExecute(r ApiWriteTokenIssuerReques
 			localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 		}
 		// body params
-		localVarPostBody = r.body
+		localVarPostBody = r.params
 		req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 		if err != nil {
 			return localVarReturnValue, nil, err

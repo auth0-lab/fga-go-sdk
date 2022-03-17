@@ -106,11 +106,13 @@ func NewConfiguration(userConfig UserConfiguration) (*Configuration, error) {
 		return nil, reportError("UserConfiguration.ClientId and userConfig.ClientSecret are required")
 	}
 
+	userAgent := strings.Replace("auth0-fga-sdk {sdkId}/{packageVersion}", "{sdkId}", "go", -1)
+	userAgent = strings.Replace(userAgent, "{packageVersion}", "0.3.0", -1)
 	cfg := &Configuration{
 		Host:           environmentConfig.Host,
 		Scheme:         environmentConfig.Scheme,
 		DefaultHeaders: make(map[string]string),
-		UserAgent:      strings.Replace("auth0-fga-sdk/go/{packageVersion}", "{packageVersion}", "0.2.2", -1),
+		UserAgent:      userAgent,
 		Debug:          false,
 		StoreId:        userConfig.StoreId,
 		ClientId:       userConfig.ClientId,

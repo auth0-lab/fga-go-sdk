@@ -42,6 +42,7 @@ docs/PathUnknownErrorMessageResponse.md
 docs/ReadAssertionsResponse.md
 docs/ReadAuthorizationModelResponse.md
 docs/ReadAuthorizationModelsResponse.md
+docs/ReadChangesResponse.md
 docs/ReadRequestParams.md
 docs/ReadResponse.md
 docs/ReadSettingsResponse.md
@@ -50,8 +51,10 @@ docs/ResourceExhaustedErrorMessageResponse.md
 docs/Status.md
 docs/TokenIssuer.md
 docs/Tuple.md
+docs/TupleChange.md
 docs/TupleKey.md
 docs/TupleKeys.md
+docs/TupleOperation.md
 docs/TypeDefinition.md
 docs/TypeDefinitions.md
 docs/Users.md
@@ -96,6 +99,7 @@ model_path_unknown_error_message_response.go
 model_read_assertions_response.go
 model_read_authorization_model_response.go
 model_read_authorization_models_response.go
+model_read_changes_response.go
 model_read_request_params.go
 model_read_response.go
 model_read_settings_response.go
@@ -104,8 +108,10 @@ model_resource_exhausted_error_message_response.go
 model_status.go
 model_token_issuer.go
 model_tuple.go
+model_tuple_change.go
 model_tuple_key.go
 model_tuple_keys.go
+model_tuple_operation.go
 model_type_definition.go
 model_type_definitions.go
 model_users.go

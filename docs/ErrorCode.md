@@ -111,6 +111,8 @@
 
 * `QUERY_STRING_TYPE_CONTINUATION_TOKEN_MISMATCH` (value: `"query_string_type_continuation_token_mismatch"`)
 
+* `WRITE_OPERATIONS_EXCEEDED_BATCH_LIMIT` (value: `"write_operations_exceeded_batch_limit"`)
+
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

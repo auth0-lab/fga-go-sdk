@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **TupleKey** | Pointer to [**TupleKey**](TupleKey.md) |  | [optional] 
-**Operation** | Pointer to **string** |  | [optional] 
+**Operation** | Pointer to [**TupleOperation**](TupleOperation.md) |  | [optional] [default to WRITE]
 **Timestamp** | Pointer to **time.Time** |  | [optional] 
 
 ## Methods
@@ -54,20 +54,20 @@ HasTupleKey returns a boolean if a field has been set.
 
 ### GetOperation
 
-`func (o *TupleChange) GetOperation() string`
+`func (o *TupleChange) GetOperation() TupleOperation`
 
 GetOperation returns the Operation field if non-nil, zero value otherwise.
 
 ### GetOperationOk
 
-`func (o *TupleChange) GetOperationOk() (*string, bool)`
+`func (o *TupleChange) GetOperationOk() (*TupleOperation, bool)`
 
 GetOperationOk returns a tuple with the Operation field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetOperation
 
-`func (o *TupleChange) SetOperation(v string)`
+`func (o *TupleChange) SetOperation(v TupleOperation)`
 
 SetOperation sets Operation field to given value.
 

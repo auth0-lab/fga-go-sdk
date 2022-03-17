@@ -11,6 +11,7 @@ Method | HTTP request | Description
 [**ReadAssertions**](Auth0FgaApi.md#ReadAssertions) | **Get** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
 [**ReadAuthorizationModel**](Auth0FgaApi.md#ReadAuthorizationModel) | **Get** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
 [**ReadAuthorizationModels**](Auth0FgaApi.md#ReadAuthorizationModels) | **Get** /stores/{store_id}/authorization-models | Return all the authorization model IDs for a particular store
+[**ReadChanges**](Auth0FgaApi.md#ReadChanges) | **Get** /stores/{store_id}/changes | Return a list of all the tuple changes
 [**ReadSettings**](Auth0FgaApi.md#ReadSettings) | **Get** /stores/{store_id}/settings | Return store settings, including the environment tag
 [**Write**](Auth0FgaApi.md#Write) | **Post** /stores/{store_id}/write | Add or delete tuples from the store
 [**WriteAssertions**](Auth0FgaApi.md#WriteAssertions) | **Put** /stores/{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
@@ -22,7 +23,7 @@ Method | HTTP request | Description
 
 ## Check
 
-> CheckResponse Check(ctx).Body(body).Execute()
+> CheckResponse Check(ctx).Params(params).Execute()
 
 Check whether a user is authorized to access an object
 
@@ -42,7 +43,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewCheckRequestParams() // CheckRequestParams | 
+    params := *openapiclient.NewCheckRequestParams() // CheckRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -53,7 +54,7 @@ func main() {
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(body).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.Check(context.Background()).Params(params).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Check``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -91,7 +92,7 @@ Other parameters are passed through a pointer to a apiCheckRequest struct via th
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**body** | [**CheckRequestParams**](CheckRequestParams.md) |  | 
+**params** | [**CheckRequestParams**](CheckRequestParams.md) |  | 
 
 ### Return type
 
@@ -202,7 +203,7 @@ Name | Type | Description  | Notes
 
 ## Expand
 
-> ExpandResponse Expand(ctx).Body(body).Execute()
+> ExpandResponse Expand(ctx).Params(params).Execute()
 
 Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
 
@@ -222,7 +223,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewExpandRequestParams() // ExpandRequestParams | 
+    params := *openapiclient.NewExpandRequestParams() // ExpandRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -233,7 +234,7 @@ func main() {
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.Expand(context.Background()).Body(body).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.Expand(context.Background()).Params(params).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Expand``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -271,7 +272,7 @@ Other parameters are passed through a pointer to a apiExpandRequest struct via t
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**body** | [**ExpandRequestParams**](ExpandRequestParams.md) |  | 
+**params** | [**ExpandRequestParams**](ExpandRequestParams.md) |  | 
 
 ### Return type
 
@@ -293,7 +294,7 @@ Name | Type | Description  | Notes
 
 ## Read
 
-> ReadResponse Read(ctx).Body(body).Execute()
+> ReadResponse Read(ctx).Params(params).Execute()
 
 Get tuples from the store that matches a query, without following userset rewrite rules
 
@@ -313,7 +314,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewReadRequestParams() // ReadRequestParams | 
+    params := *openapiclient.NewReadRequestParams() // ReadRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -324,7 +325,7 @@ func main() {
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.Read(context.Background()).Body(body).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.Read(context.Background()).Params(params).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Read``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -362,7 +363,7 @@ Other parameters are passed through a pointer to a apiReadRequest struct via the
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**body** | [**ReadRequestParams**](ReadRequestParams.md) |  | 
+**params** | [**ReadRequestParams**](ReadRequestParams.md) |  | 
 
 ### Return type
 
@@ -657,6 +658,101 @@ Name | Type | Description  | Notes
 [[Back to README]](../README.md)
 
 
+## ReadChanges
+
+> ReadChangesResponse ReadChanges(ctx).Type_(type_).PageSize(pageSize).ContinuationToken(continuationToken).Execute()
+
+Return a list of all the tuple changes
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    auth0fga "github.com/auth0-lab/fga-go-sdk"
+)
+
+func main() {
+    
+    type_ := "type__example" // string |  (optional)
+    pageSize := int32(56) // int32 |  (optional)
+    continuationToken := "continuationToken_example" // string |  (optional)
+
+    configuration := auth0fga.NewConfiguration(UserConfiguration{
+        StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+    })
+
+    apiClient := auth0fga.NewAPIClient(configuration)
+
+    resp, r, err := apiClient.Auth0FgaApi.ReadChanges(context.Background()).Type_(type_).PageSize(pageSize).ContinuationToken(continuationToken).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ReadChanges``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case Auth0FgaApiAuthenticationError:
+            // Handle authentication error
+        case Auth0FgaApiValidationError:
+            // Handle parameter validation error
+        case Auth0FgaApiNotFoundError:
+            // Handle not found error
+        case Auth0FgaApiInternalError:
+            // Handle API internal error
+        case Auth0FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
+    }
+    // response from `ReadChanges`: ReadChangesResponse
+    fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.ReadChanges`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiReadChangesRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**type_** | **string** |  | 
+**pageSize** | **int32** |  | 
+**continuationToken** | **string** |  | 
+
+### Return type
+
+[**ReadChangesResponse**](ReadChangesResponse.md)
+
+### Authorization
+
+[ClientCredentials](../README.md#ClientCredentials)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## ReadSettings
 
 > ReadSettingsResponse ReadSettings(ctx).Execute()
@@ -748,7 +844,7 @@ Name | Type | Description  | Notes
 
 ## Write
 
-> map[string]interface{} Write(ctx).Body(body).Execute()
+> map[string]interface{} Write(ctx).Params(params).Execute()
 
 Add or delete tuples from the store
 
@@ -768,7 +864,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewWriteRequestParams() // WriteRequestParams | 
+    params := *openapiclient.NewWriteRequestParams() // WriteRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -779,7 +875,7 @@ func main() {
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(body).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.Write(context.Background()).Params(params).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Write``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -817,7 +913,7 @@ Other parameters are passed through a pointer to a apiWriteRequest struct via th
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**body** | [**WriteRequestParams**](WriteRequestParams.md) |  | 
+**params** | [**WriteRequestParams**](WriteRequestParams.md) |  | 
 
 ### Return type
 
@@ -839,7 +935,7 @@ Name | Type | Description  | Notes
 
 ## WriteAssertions
 
-> WriteAssertions(ctx, authorizationModelId).Body(body).Execute()
+> WriteAssertions(ctx, authorizationModelId).Params(params).Execute()
 
 Upsert assertions for an authorization model ID
 
@@ -860,7 +956,7 @@ import (
 func main() {
     
     authorizationModelId := "authorizationModelId_example" // string | 
-    body := *openapiclient.NewWriteAssertionsRequestParams([]openapiclient.Assertion{*openapiclient.NewAssertion(*openapiclient.NewTupleKey(), false)}) // WriteAssertionsRequestParams | 
+    params := *openapiclient.NewWriteAssertionsRequestParams([]openapiclient.Assertion{*openapiclient.NewAssertion(false)}) // WriteAssertionsRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -871,7 +967,7 @@ func main() {
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.WriteAssertions(context.Background(), authorizationModelId).Body(body).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.WriteAssertions(context.Background(), authorizationModelId).Params(params).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteAssertions``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -908,7 +1004,7 @@ Other parameters are passed through a pointer to a apiWriteAssertionsRequest str
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**body** | [**WriteAssertionsRequestParams**](WriteAssertionsRequestParams.md) |  | 
+**params** | [**WriteAssertionsRequestParams**](WriteAssertionsRequestParams.md) |  | 
 
 ### Return type
 
@@ -930,7 +1026,7 @@ Name | Type | Description  | Notes
 
 ## WriteAuthorizationModel
 
-> WriteAuthorizationModelResponse WriteAuthorizationModel(ctx).Body(body).Execute()
+> WriteAuthorizationModelResponse WriteAuthorizationModel(ctx).TypeDefinitions(typeDefinitions).Execute()
 
 Create a new authorization model
 
@@ -950,7 +1046,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewTypeDefinitions() // TypeDefinitions | 
+    typeDefinitions := *openapiclient.NewTypeDefinitions() // TypeDefinitions | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -961,7 +1057,7 @@ func main() {
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.WriteAuthorizationModel(context.Background()).Body(body).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.WriteAuthorizationModel(context.Background()).TypeDefinitions(typeDefinitions).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteAuthorizationModel``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -999,7 +1095,7 @@ Other parameters are passed through a pointer to a apiWriteAuthorizationModelReq
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**body** | [**TypeDefinitions**](TypeDefinitions.md) |  | 
+**typeDefinitions** | [**TypeDefinitions**](TypeDefinitions.md) |  | 
 
 ### Return type
 
@@ -1021,7 +1117,7 @@ Name | Type | Description  | Notes
 
 ## WriteSettings
 
-> WriteSettingsResponse WriteSettings(ctx).Body(body).Execute()
+> WriteSettingsResponse WriteSettings(ctx).Params(params).Execute()
 
 Update the environment tag for a store
 
@@ -1041,7 +1137,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewWriteSettingsRequestParams() // WriteSettingsRequestParams | 
+    params := *openapiclient.NewWriteSettingsRequestParams() // WriteSettingsRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -1052,7 +1148,7 @@ func main() {
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.WriteSettings(context.Background()).Body(body).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.WriteSettings(context.Background()).Params(params).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteSettings``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1090,7 +1186,7 @@ Other parameters are passed through a pointer to a apiWriteSettingsRequest struc
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**body** | [**WriteSettingsRequestParams**](WriteSettingsRequestParams.md) |  | 
+**params** | [**WriteSettingsRequestParams**](WriteSettingsRequestParams.md) |  | 
 
 ### Return type
 
@@ -1112,7 +1208,7 @@ Name | Type | Description  | Notes
 
 ## WriteTokenIssuer
 
-> WriteTokenIssuersResponse WriteTokenIssuer(ctx).Body(body).Execute()
+> WriteTokenIssuersResponse WriteTokenIssuer(ctx).Params(params).Execute()
 
 Add 3rd party token issuer for Auth0 FGA read and write operations
 
@@ -1132,7 +1228,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewWriteTokenIssuersRequestParams() // WriteTokenIssuersRequestParams | 
+    params := *openapiclient.NewWriteTokenIssuersRequestParams() // WriteTokenIssuersRequestParams | 
 
     configuration := auth0fga.NewConfiguration(UserConfiguration{
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
@@ -1143,7 +1239,7 @@ func main() {
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.WriteTokenIssuer(context.Background()).Body(body).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.WriteTokenIssuer(context.Background()).Params(params).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteTokenIssuer``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1181,7 +1277,7 @@ Other parameters are passed through a pointer to a apiWriteTokenIssuerRequest st
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**body** | [**WriteTokenIssuersRequestParams**](WriteTokenIssuersRequestParams.md) |  | 
+**params** | [**WriteTokenIssuersRequestParams**](WriteTokenIssuersRequestParams.md) |  | 
 
 ### Return type
 

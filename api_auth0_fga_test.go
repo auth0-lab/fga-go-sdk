@@ -331,7 +331,7 @@ func TestAuth0FgaApi(t *testing.T) {
 				return resp, nil
 			},
 		)
-		got, response, err := apiClient.Auth0FgaApi.WriteAuthorizationModel(context.Background()).Body(requestBody).Execute()
+		got, response, err := apiClient.Auth0FgaApi.WriteAuthorizationModel(context.Background()).TypeDefinitions(requestBody).Execute()
 		if err != nil {
 			t.Errorf("%v", err)
 			return
@@ -431,7 +431,7 @@ func TestAuth0FgaApi(t *testing.T) {
 				return resp, nil
 			},
 		)
-		got, response, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		got, response, err := apiClient.Auth0FgaApi.Check(context.Background()).Params(requestBody).Execute()
 		if err != nil {
 			t.Errorf("%v", err)
 			return
@@ -488,7 +488,7 @@ func TestAuth0FgaApi(t *testing.T) {
 				return resp, nil
 			},
 		)
-		_, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(requestBody).Execute()
+		_, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Params(requestBody).Execute()
 		if err != nil {
 			t.Errorf("%v", err)
 			return
@@ -536,7 +536,7 @@ func TestAuth0FgaApi(t *testing.T) {
 				return resp, nil
 			},
 		)
-		_, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(requestBody).Execute()
+		_, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Params(requestBody).Execute()
 		if err != nil {
 			t.Errorf("%v", err)
 			return
@@ -581,7 +581,7 @@ func TestAuth0FgaApi(t *testing.T) {
 				return resp, nil
 			},
 		)
-		got, response, err := apiClient.Auth0FgaApi.Expand(context.Background()).Body(requestBody).Execute()
+		got, response, err := apiClient.Auth0FgaApi.Expand(context.Background()).Params(requestBody).Execute()
 		if err != nil {
 			t.Errorf("%v", err)
 			return
@@ -633,7 +633,7 @@ func TestAuth0FgaApi(t *testing.T) {
 				return resp, nil
 			},
 		)
-		got, response, err := apiClient.Auth0FgaApi.Read(context.Background()).Body(requestBody).Execute()
+		got, response, err := apiClient.Auth0FgaApi.Read(context.Background()).Params(requestBody).Execute()
 		if err != nil {
 			t.Errorf("%v", err)
 			return
@@ -651,6 +651,59 @@ func TestAuth0FgaApi(t *testing.T) {
 		}
 
 		if len(*got.Tuples) != len(*expectedResponse.Tuples) {
+			t.Errorf("Auth0Fga%v().Execute() = %v, want %v", test.Name, string(responseJson), test.JsonResponse)
+			return
+		}
+	})
+
+	t.Run("ReadChanges", func(t *testing.T) {
+		test := TestDefinition{
+			Name:           "ReadChanges",
+			JsonResponse:   `{"changes":[{"tuple_key":{"user":"anne@auth0.com","relation":"reader","object":"repo:auth0/express-jwt"},"operation":"write","timestamp": "2000-01-01T00:00:00Z"}],"continuation_token":"eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ=="}`,
+			ResponseStatus: 200,
+			Method:         "GET",
+			RequestPath:    "changes",
+		}
+
+		var expectedResponse ReadChangesResponse
+		if err := json.Unmarshal([]byte(test.JsonResponse), &expectedResponse); err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+		httpmock.RegisterResponder(test.Method, fmt.Sprintf("%s://%s/stores/%s/%s", configuration.Scheme, configuration.Host, configuration.StoreId, test.RequestPath),
+			func(req *http.Request) (*http.Response, error) {
+				resp, err := httpmock.NewJsonResponse(test.ResponseStatus, expectedResponse)
+				if err != nil {
+					return httpmock.NewStringResponse(500, ""), nil
+				}
+				return resp, nil
+			},
+		)
+		got, response, err := apiClient.Auth0FgaApi.ReadChanges(context.Background()).
+			Type_("repo").
+			PageSize(25).
+			ContinuationToken("eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==").
+			Execute()
+		if err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		if response.StatusCode != test.ResponseStatus {
+			t.Errorf("Auth0Fga%v().Execute() = %v, want %v", test.Name, response.StatusCode, test.ResponseStatus)
+			return
+		}
+
+		responseJson, err := got.MarshalJSON()
+		if err != nil {
+			t.Errorf("%v", err)
+			return
+		}
+
+		if len(*got.Changes) != len(*expectedResponse.Changes) {
 			t.Errorf("Auth0Fga%v().Execute() = %v, want %v", test.Name, string(responseJson), test.JsonResponse)
 			return
 		}
@@ -689,7 +742,7 @@ func TestAuth0FgaApi(t *testing.T) {
 				return httpmock.NewJsonResponse(400, errObj)
 			},
 		)
-		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Params(requestBody).Execute()
 		if err == nil {
 			t.Errorf("Expected error with 400 request but there is none")
 			return
@@ -760,7 +813,7 @@ func TestAuth0FgaApi(t *testing.T) {
 				return httpmock.NewJsonResponse(401, errObj)
 			},
 		)
-		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Params(requestBody).Execute()
 		if err == nil {
 			t.Errorf("Expected error with 401 request but there is none")
 			return
@@ -827,7 +880,7 @@ func TestAuth0FgaApi(t *testing.T) {
 				return httpmock.NewJsonResponse(404, errObj)
 			},
 		)
-		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Params(requestBody).Execute()
 		if err == nil {
 			t.Errorf("Expected error with 404 request but there is none")
 			return
@@ -917,7 +970,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		updatedApiClient := NewAPIClient(updatedConfiguration)
 
-		_, _, err = updatedApiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		_, _, err = updatedApiClient.Auth0FgaApi.Check(context.Background()).Params(requestBody).Execute()
 		if err == nil {
 			t.Errorf("Expected error with 429 request but there is none")
 			return
@@ -998,7 +1051,7 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		updatedApiClient := NewAPIClient(updatedConfiguration)
 
-		got, response, err := updatedApiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		got, response, err := updatedApiClient.Auth0FgaApi.Check(context.Background()).Params(requestBody).Execute()
 
 		if err != nil {
 			t.Errorf("%v", err)
@@ -1054,7 +1107,7 @@ func TestAuth0FgaApi(t *testing.T) {
 				return httpmock.NewJsonResponse(500, errObj)
 			},
 		)
-		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(requestBody).Execute()
+		_, _, err := apiClient.Auth0FgaApi.Check(context.Background()).Params(requestBody).Execute()
 		if err == nil {
 			t.Errorf("Expected error with 500 request but there is none")
 			return
