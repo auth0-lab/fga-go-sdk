@@ -1,6 +1,6 @@
-# Contributing to Auth0 projects
+# Contributing to Auth0 Fine Grained Authorization (FGA) projects
 
-A big welcome and thank you for considering contributing to the Auth0 open source projects. It’s people like you that make it a reality for users in our community.
+A big welcome and thank you for considering contributing to the Auth0 Fine Grained Authorization (FGA) open source projects. It’s people like you that make it a reality for users in our community.
 
 Reading and following these guidelines will help us make the contribution process easy and effective for everyone involved. It also communicates that you agree to respect the time of the developers managing and developing these open source projects. In return, we will reciprocate that respect by addressing your issue, assessing changes, and helping you finalize your pull requests.
 
@@ -39,8 +39,8 @@ Pull Requests are not currently open, please [raise an issue](https://github.com
 
 ### Have a question or problem?
 
-Please do not open issues for general support or usage questions. Instead, join us over in the [Auth0Lab Discord community](https://discord.gg/8naAwJfWN6).
+Please do not open issues for general support or usage questions. Instead, join us over in the [support community](https://discord.gg/8naAwJfWN6).
 
 ### Vulnerability Reporting
 
-Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/responsible-disclosure-policy) details the procedure for disclosing security issues.
+Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://github.com/auth0-lab/fga-go-sdk/blob/main/.github/SECURITY.md) details the procedure for disclosing security issues.

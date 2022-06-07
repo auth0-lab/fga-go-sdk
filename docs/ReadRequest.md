@@ -1,4 +1,4 @@
-# ReadRequestParams
+# ReadRequest
 
 ## Properties
 
@@ -11,120 +11,120 @@ Name | Type | Description | Notes
 
 ## Methods
 
-### NewReadRequestParams
+### NewReadRequest
 
-`func NewReadRequestParams() *ReadRequestParams`
+`func NewReadRequest() *ReadRequest`
 
-NewReadRequestParams instantiates a new ReadRequestParams object
+NewReadRequest instantiates a new ReadRequest object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewReadRequestParamsWithDefaults
+### NewReadRequestWithDefaults
 
-`func NewReadRequestParamsWithDefaults() *ReadRequestParams`
+`func NewReadRequestWithDefaults() *ReadRequest`
 
-NewReadRequestParamsWithDefaults instantiates a new ReadRequestParams object
+NewReadRequestWithDefaults instantiates a new ReadRequest object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetTupleKey
 
-`func (o *ReadRequestParams) GetTupleKey() TupleKey`
+`func (o *ReadRequest) GetTupleKey() TupleKey`
 
 GetTupleKey returns the TupleKey field if non-nil, zero value otherwise.
 
 ### GetTupleKeyOk
 
-`func (o *ReadRequestParams) GetTupleKeyOk() (*TupleKey, bool)`
+`func (o *ReadRequest) GetTupleKeyOk() (*TupleKey, bool)`
 
 GetTupleKeyOk returns a tuple with the TupleKey field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetTupleKey
 
-`func (o *ReadRequestParams) SetTupleKey(v TupleKey)`
+`func (o *ReadRequest) SetTupleKey(v TupleKey)`
 
 SetTupleKey sets TupleKey field to given value.
 
 ### HasTupleKey
 
-`func (o *ReadRequestParams) HasTupleKey() bool`
+`func (o *ReadRequest) HasTupleKey() bool`
 
 HasTupleKey returns a boolean if a field has been set.
 
 ### GetAuthorizationModelId
 
-`func (o *ReadRequestParams) GetAuthorizationModelId() string`
+`func (o *ReadRequest) GetAuthorizationModelId() string`
 
 GetAuthorizationModelId returns the AuthorizationModelId field if non-nil, zero value otherwise.
 
 ### GetAuthorizationModelIdOk
 
-`func (o *ReadRequestParams) GetAuthorizationModelIdOk() (*string, bool)`
+`func (o *ReadRequest) GetAuthorizationModelIdOk() (*string, bool)`
 
 GetAuthorizationModelIdOk returns a tuple with the AuthorizationModelId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAuthorizationModelId
 
-`func (o *ReadRequestParams) SetAuthorizationModelId(v string)`
+`func (o *ReadRequest) SetAuthorizationModelId(v string)`
 
 SetAuthorizationModelId sets AuthorizationModelId field to given value.
 
 ### HasAuthorizationModelId
 
-`func (o *ReadRequestParams) HasAuthorizationModelId() bool`
+`func (o *ReadRequest) HasAuthorizationModelId() bool`
 
 HasAuthorizationModelId returns a boolean if a field has been set.
 
 ### GetPageSize
 
-`func (o *ReadRequestParams) GetPageSize() int32`
+`func (o *ReadRequest) GetPageSize() int32`
 
 GetPageSize returns the PageSize field if non-nil, zero value otherwise.
 
 ### GetPageSizeOk
 
-`func (o *ReadRequestParams) GetPageSizeOk() (*int32, bool)`
+`func (o *ReadRequest) GetPageSizeOk() (*int32, bool)`
 
 GetPageSizeOk returns a tuple with the PageSize field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetPageSize
 
-`func (o *ReadRequestParams) SetPageSize(v int32)`
+`func (o *ReadRequest) SetPageSize(v int32)`
 
 SetPageSize sets PageSize field to given value.
 
 ### HasPageSize
 
-`func (o *ReadRequestParams) HasPageSize() bool`
+`func (o *ReadRequest) HasPageSize() bool`
 
 HasPageSize returns a boolean if a field has been set.
 
 ### GetContinuationToken
 
-`func (o *ReadRequestParams) GetContinuationToken() string`
+`func (o *ReadRequest) GetContinuationToken() string`
 
 GetContinuationToken returns the ContinuationToken field if non-nil, zero value otherwise.
 
 ### GetContinuationTokenOk
 
-`func (o *ReadRequestParams) GetContinuationTokenOk() (*string, bool)`
+`func (o *ReadRequest) GetContinuationTokenOk() (*string, bool)`
 
 GetContinuationTokenOk returns a tuple with the ContinuationToken field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetContinuationToken
 
-`func (o *ReadRequestParams) SetContinuationToken(v string)`
+`func (o *ReadRequest) SetContinuationToken(v string)`
 
 SetContinuationToken sets ContinuationToken field to given value.
 
 ### HasContinuationToken
 
-`func (o *ReadRequestParams) HasContinuationToken() bool`
+`func (o *ReadRequest) HasContinuationToken() bool`
 
 HasContinuationToken returns a boolean if a field has been set.
 

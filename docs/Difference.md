@@ -1,4 +1,4 @@
-# AuthorizationmodelDifference
+# Difference
 
 ## Properties
 
@@ -9,70 +9,70 @@ Name | Type | Description | Notes
 
 ## Methods
 
-### NewAuthorizationmodelDifference
+### NewDifference
 
-`func NewAuthorizationmodelDifference() *AuthorizationmodelDifference`
+`func NewDifference() *Difference`
 
-NewAuthorizationmodelDifference instantiates a new AuthorizationmodelDifference object
+NewDifference instantiates a new Difference object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewAuthorizationmodelDifferenceWithDefaults
+### NewDifferenceWithDefaults
 
-`func NewAuthorizationmodelDifferenceWithDefaults() *AuthorizationmodelDifference`
+`func NewDifferenceWithDefaults() *Difference`
 
-NewAuthorizationmodelDifferenceWithDefaults instantiates a new AuthorizationmodelDifference object
+NewDifferenceWithDefaults instantiates a new Difference object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetBase
 
-`func (o *AuthorizationmodelDifference) GetBase() Userset`
+`func (o *Difference) GetBase() Userset`
 
 GetBase returns the Base field if non-nil, zero value otherwise.
 
 ### GetBaseOk
 
-`func (o *AuthorizationmodelDifference) GetBaseOk() (*Userset, bool)`
+`func (o *Difference) GetBaseOk() (*Userset, bool)`
 
 GetBaseOk returns a tuple with the Base field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetBase
 
-`func (o *AuthorizationmodelDifference) SetBase(v Userset)`
+`func (o *Difference) SetBase(v Userset)`
 
 SetBase sets Base field to given value.
 
 ### HasBase
 
-`func (o *AuthorizationmodelDifference) HasBase() bool`
+`func (o *Difference) HasBase() bool`
 
 HasBase returns a boolean if a field has been set.
 
 ### GetSubtract
 
-`func (o *AuthorizationmodelDifference) GetSubtract() Userset`
+`func (o *Difference) GetSubtract() Userset`
 
 GetSubtract returns the Subtract field if non-nil, zero value otherwise.
 
 ### GetSubtractOk
 
-`func (o *AuthorizationmodelDifference) GetSubtractOk() (*Userset, bool)`
+`func (o *Difference) GetSubtractOk() (*Userset, bool)`
 
 GetSubtractOk returns a tuple with the Subtract field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSubtract
 
-`func (o *AuthorizationmodelDifference) SetSubtract(v Userset)`
+`func (o *Difference) SetSubtract(v Userset)`
 
 SetSubtract sets Subtract field to given value.
 
 ### HasSubtract
 
-`func (o *AuthorizationmodelDifference) HasSubtract() bool`
+`func (o *Difference) HasSubtract() bool`
 
 HasSubtract returns a boolean if a field has been set.
 

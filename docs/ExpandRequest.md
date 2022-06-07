@@ -1,4 +1,4 @@
-# ExpandRequestParams
+# ExpandRequest
 
 ## Properties
 
@@ -9,70 +9,70 @@ Name | Type | Description | Notes
 
 ## Methods
 
-### NewExpandRequestParams
+### NewExpandRequest
 
-`func NewExpandRequestParams() *ExpandRequestParams`
+`func NewExpandRequest() *ExpandRequest`
 
-NewExpandRequestParams instantiates a new ExpandRequestParams object
+NewExpandRequest instantiates a new ExpandRequest object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewExpandRequestParamsWithDefaults
+### NewExpandRequestWithDefaults
 
-`func NewExpandRequestParamsWithDefaults() *ExpandRequestParams`
+`func NewExpandRequestWithDefaults() *ExpandRequest`
 
-NewExpandRequestParamsWithDefaults instantiates a new ExpandRequestParams object
+NewExpandRequestWithDefaults instantiates a new ExpandRequest object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetTupleKey
 
-`func (o *ExpandRequestParams) GetTupleKey() TupleKey`
+`func (o *ExpandRequest) GetTupleKey() TupleKey`
 
 GetTupleKey returns the TupleKey field if non-nil, zero value otherwise.
 
 ### GetTupleKeyOk
 
-`func (o *ExpandRequestParams) GetTupleKeyOk() (*TupleKey, bool)`
+`func (o *ExpandRequest) GetTupleKeyOk() (*TupleKey, bool)`
 
 GetTupleKeyOk returns a tuple with the TupleKey field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetTupleKey
 
-`func (o *ExpandRequestParams) SetTupleKey(v TupleKey)`
+`func (o *ExpandRequest) SetTupleKey(v TupleKey)`
 
 SetTupleKey sets TupleKey field to given value.
 
 ### HasTupleKey
 
-`func (o *ExpandRequestParams) HasTupleKey() bool`
+`func (o *ExpandRequest) HasTupleKey() bool`
 
 HasTupleKey returns a boolean if a field has been set.
 
 ### GetAuthorizationModelId
 
-`func (o *ExpandRequestParams) GetAuthorizationModelId() string`
+`func (o *ExpandRequest) GetAuthorizationModelId() string`
 
 GetAuthorizationModelId returns the AuthorizationModelId field if non-nil, zero value otherwise.
 
 ### GetAuthorizationModelIdOk
 
-`func (o *ExpandRequestParams) GetAuthorizationModelIdOk() (*string, bool)`
+`func (o *ExpandRequest) GetAuthorizationModelIdOk() (*string, bool)`
 
 GetAuthorizationModelIdOk returns a tuple with the AuthorizationModelId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAuthorizationModelId
 
-`func (o *ExpandRequestParams) SetAuthorizationModelId(v string)`
+`func (o *ExpandRequest) SetAuthorizationModelId(v string)`
 
 SetAuthorizationModelId sets AuthorizationModelId field to given value.
 
 ### HasAuthorizationModelId
 
-`func (o *ExpandRequestParams) HasAuthorizationModelId() bool`
+`func (o *ExpandRequest) HasAuthorizationModelId() bool`
 
 HasAuthorizationModelId returns a boolean if a field has been set.
 

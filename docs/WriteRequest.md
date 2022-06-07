@@ -1,4 +1,4 @@
-# WriteRequestParams
+# WriteRequest
 
 ## Properties
 
@@ -7,126 +7,100 @@ Name | Type | Description | Notes
 **Writes** | Pointer to [**TupleKeys**](TupleKeys.md) |  | [optional] 
 **Deletes** | Pointer to [**TupleKeys**](TupleKeys.md) |  | [optional] 
 **AuthorizationModelId** | Pointer to **string** |  | [optional] 
-**LockTuple** | Pointer to [**Tuple**](Tuple.md) |  | [optional] 
 
 ## Methods
 
-### NewWriteRequestParams
+### NewWriteRequest
 
-`func NewWriteRequestParams() *WriteRequestParams`
+`func NewWriteRequest() *WriteRequest`
 
-NewWriteRequestParams instantiates a new WriteRequestParams object
+NewWriteRequest instantiates a new WriteRequest object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewWriteRequestParamsWithDefaults
+### NewWriteRequestWithDefaults
 
-`func NewWriteRequestParamsWithDefaults() *WriteRequestParams`
+`func NewWriteRequestWithDefaults() *WriteRequest`
 
-NewWriteRequestParamsWithDefaults instantiates a new WriteRequestParams object
+NewWriteRequestWithDefaults instantiates a new WriteRequest object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetWrites
 
-`func (o *WriteRequestParams) GetWrites() TupleKeys`
+`func (o *WriteRequest) GetWrites() TupleKeys`
 
 GetWrites returns the Writes field if non-nil, zero value otherwise.
 
 ### GetWritesOk
 
-`func (o *WriteRequestParams) GetWritesOk() (*TupleKeys, bool)`
+`func (o *WriteRequest) GetWritesOk() (*TupleKeys, bool)`
 
 GetWritesOk returns a tuple with the Writes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetWrites
 
-`func (o *WriteRequestParams) SetWrites(v TupleKeys)`
+`func (o *WriteRequest) SetWrites(v TupleKeys)`
 
 SetWrites sets Writes field to given value.
 
 ### HasWrites
 
-`func (o *WriteRequestParams) HasWrites() bool`
+`func (o *WriteRequest) HasWrites() bool`
 
 HasWrites returns a boolean if a field has been set.
 
 ### GetDeletes
 
-`func (o *WriteRequestParams) GetDeletes() TupleKeys`
+`func (o *WriteRequest) GetDeletes() TupleKeys`
 
 GetDeletes returns the Deletes field if non-nil, zero value otherwise.
 
 ### GetDeletesOk
 
-`func (o *WriteRequestParams) GetDeletesOk() (*TupleKeys, bool)`
+`func (o *WriteRequest) GetDeletesOk() (*TupleKeys, bool)`
 
 GetDeletesOk returns a tuple with the Deletes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDeletes
 
-`func (o *WriteRequestParams) SetDeletes(v TupleKeys)`
+`func (o *WriteRequest) SetDeletes(v TupleKeys)`
 
 SetDeletes sets Deletes field to given value.
 
 ### HasDeletes
 
-`func (o *WriteRequestParams) HasDeletes() bool`
+`func (o *WriteRequest) HasDeletes() bool`
 
 HasDeletes returns a boolean if a field has been set.
 
 ### GetAuthorizationModelId
 
-`func (o *WriteRequestParams) GetAuthorizationModelId() string`
+`func (o *WriteRequest) GetAuthorizationModelId() string`
 
 GetAuthorizationModelId returns the AuthorizationModelId field if non-nil, zero value otherwise.
 
 ### GetAuthorizationModelIdOk
 
-`func (o *WriteRequestParams) GetAuthorizationModelIdOk() (*string, bool)`
+`func (o *WriteRequest) GetAuthorizationModelIdOk() (*string, bool)`
 
 GetAuthorizationModelIdOk returns a tuple with the AuthorizationModelId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAuthorizationModelId
 
-`func (o *WriteRequestParams) SetAuthorizationModelId(v string)`
+`func (o *WriteRequest) SetAuthorizationModelId(v string)`
 
 SetAuthorizationModelId sets AuthorizationModelId field to given value.
 
 ### HasAuthorizationModelId
 
-`func (o *WriteRequestParams) HasAuthorizationModelId() bool`
+`func (o *WriteRequest) HasAuthorizationModelId() bool`
 
 HasAuthorizationModelId returns a boolean if a field has been set.
-
-### GetLockTuple
-
-`func (o *WriteRequestParams) GetLockTuple() Tuple`
-
-GetLockTuple returns the LockTuple field if non-nil, zero value otherwise.
-
-### GetLockTupleOk
-
-`func (o *WriteRequestParams) GetLockTupleOk() (*Tuple, bool)`
-
-GetLockTupleOk returns a tuple with the LockTuple field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetLockTuple
-
-`func (o *WriteRequestParams) SetLockTuple(v Tuple)`
-
-SetLockTuple sets LockTuple field to given value.
-
-### HasLockTuple
-
-`func (o *WriteRequestParams) HasLockTuple() bool`
-
-HasLockTuple returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

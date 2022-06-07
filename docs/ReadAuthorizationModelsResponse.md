@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AuthorizationModelIds** | Pointer to **[]string** |  | [optional] 
+**AuthorizationModels** | Pointer to [**[]AuthorizationModel**](AuthorizationModel.md) |  | [optional] 
 **ContinuationToken** | Pointer to **string** |  | [optional] 
 
 ## Methods
@@ -26,30 +26,30 @@ NewReadAuthorizationModelsResponseWithDefaults instantiates a new ReadAuthorizat
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetAuthorizationModelIds
+### GetAuthorizationModels
 
-`func (o *ReadAuthorizationModelsResponse) GetAuthorizationModelIds() []string`
+`func (o *ReadAuthorizationModelsResponse) GetAuthorizationModels() []AuthorizationModel`
 
-GetAuthorizationModelIds returns the AuthorizationModelIds field if non-nil, zero value otherwise.
+GetAuthorizationModels returns the AuthorizationModels field if non-nil, zero value otherwise.
 
-### GetAuthorizationModelIdsOk
+### GetAuthorizationModelsOk
 
-`func (o *ReadAuthorizationModelsResponse) GetAuthorizationModelIdsOk() (*[]string, bool)`
+`func (o *ReadAuthorizationModelsResponse) GetAuthorizationModelsOk() (*[]AuthorizationModel, bool)`
 
-GetAuthorizationModelIdsOk returns a tuple with the AuthorizationModelIds field if it's non-nil, zero value otherwise
+GetAuthorizationModelsOk returns a tuple with the AuthorizationModels field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetAuthorizationModelIds
+### SetAuthorizationModels
 
-`func (o *ReadAuthorizationModelsResponse) SetAuthorizationModelIds(v []string)`
+`func (o *ReadAuthorizationModelsResponse) SetAuthorizationModels(v []AuthorizationModel)`
 
-SetAuthorizationModelIds sets AuthorizationModelIds field to given value.
+SetAuthorizationModels sets AuthorizationModels field to given value.
 
-### HasAuthorizationModelIds
+### HasAuthorizationModels
 
-`func (o *ReadAuthorizationModelsResponse) HasAuthorizationModelIds() bool`
+`func (o *ReadAuthorizationModelsResponse) HasAuthorizationModels() bool`
 
-HasAuthorizationModelIds returns a boolean if a field has been set.
+HasAuthorizationModels returns a boolean if a field has been set.
 
 ### GetContinuationToken
 

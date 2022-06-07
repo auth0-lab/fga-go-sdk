@@ -1,29 +1,25 @@
 # \Auth0FgaApi
 
-All URIs are relative to *http://localhost*
+All URIs are relative to *https://api.us1.fga.dev*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**Check**](Auth0FgaApi.md#Check) | **Post** /stores/{store_id}/check | Check whether a user is authorized to access an object
-[**DeleteTokenIssuer**](Auth0FgaApi.md#DeleteTokenIssuer) | **Delete** /stores/{store_id}/settings/token-issuers/{id} | Remove 3rd party token issuer for Auth0 FGA read and write operations
 [**Expand**](Auth0FgaApi.md#Expand) | **Post** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
 [**Read**](Auth0FgaApi.md#Read) | **Post** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 [**ReadAssertions**](Auth0FgaApi.md#ReadAssertions) | **Get** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
 [**ReadAuthorizationModel**](Auth0FgaApi.md#ReadAuthorizationModel) | **Get** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
 [**ReadAuthorizationModels**](Auth0FgaApi.md#ReadAuthorizationModels) | **Get** /stores/{store_id}/authorization-models | Return all the authorization model IDs for a particular store
 [**ReadChanges**](Auth0FgaApi.md#ReadChanges) | **Get** /stores/{store_id}/changes | Return a list of all the tuple changes
-[**ReadSettings**](Auth0FgaApi.md#ReadSettings) | **Get** /stores/{store_id}/settings | Return store settings, including the environment tag
 [**Write**](Auth0FgaApi.md#Write) | **Post** /stores/{store_id}/write | Add or delete tuples from the store
 [**WriteAssertions**](Auth0FgaApi.md#WriteAssertions) | **Put** /stores/{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
 [**WriteAuthorizationModel**](Auth0FgaApi.md#WriteAuthorizationModel) | **Post** /stores/{store_id}/authorization-models | Create a new authorization model
-[**WriteSettings**](Auth0FgaApi.md#WriteSettings) | **Patch** /stores/{store_id}/settings | Update the environment tag for a store
-[**WriteTokenIssuer**](Auth0FgaApi.md#WriteTokenIssuer) | **Post** /stores/{store_id}/settings/token-issuers | Add 3rd party token issuer for Auth0 FGA read and write operations
 
 
 
 ## Check
 
-> CheckResponse Check(ctx).Params(params).Execute()
+> CheckResponse Check(ctx).Body(body).Execute()
 
 Check whether a user is authorized to access an object
 
@@ -43,31 +39,32 @@ import (
 
 func main() {
     
-    params := *openapiclient.NewCheckRequestParams() // CheckRequestParams | 
+    body := *openapiclient.NewCheckRequest() // CheckRequest | 
 
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.Check(context.Background()).Params(params).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(body).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Check``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
         switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
+        case FgaApiAuthenticationError:
             // Handle authentication error
-        case Auth0FgaApiValidationError:
+        case FgaApiValidationError:
             // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
+        case FgaApiNotFoundError:
             // Handle not found error
-        case Auth0FgaApiInternalError:
+        case FgaApiInternalError:
             // Handle API internal error
-        case Auth0FgaApiRateLimitError:
+        case FgaApiRateLimitError:
             // Exponential backoff in handling rate limit error
         default:
             // Handle unknown/undefined error
@@ -92,7 +89,7 @@ Other parameters are passed through a pointer to a apiCheckRequest struct via th
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**params** | [**CheckRequestParams**](CheckRequestParams.md) |  | 
+**body** | [**CheckRequest**](CheckRequest.md) |  | 
 
 ### Return type
 
@@ -112,98 +109,9 @@ Name | Type | Description  | Notes
 [[Back to README]](../README.md)
 
 
-## DeleteTokenIssuer
-
-> DeleteTokenIssuer(ctx, id).Execute()
-
-Remove 3rd party token issuer for Auth0 FGA read and write operations
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    auth0fga "github.com/auth0-lab/fga-go-sdk"
-)
-
-func main() {
-    
-    id := "id_example" // string | Id of token issuer to be removed
-
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
-        StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
-    })
-
-    apiClient := auth0fga.NewAPIClient(configuration)
-
-    resp, r, err := apiClient.Auth0FgaApi.DeleteTokenIssuer(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.DeleteTokenIssuer``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-        switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
-            // Handle authentication error
-        case Auth0FgaApiValidationError:
-            // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
-            // Handle not found error
-        case Auth0FgaApiInternalError:
-            // Handle API internal error
-        case Auth0FgaApiRateLimitError:
-            // Exponential backoff in handling rate limit error
-        default:
-            // Handle unknown/undefined error
-        }
-    }
-}
-```
-
-### Path Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | Id of token issuer to be removed | 
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDeleteTokenIssuerRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[ClientCredentials](../README.md#ClientCredentials)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
 ## Expand
 
-> ExpandResponse Expand(ctx).Params(params).Execute()
+> ExpandResponse Expand(ctx).Body(body).Execute()
 
 Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
 
@@ -223,31 +131,32 @@ import (
 
 func main() {
     
-    params := *openapiclient.NewExpandRequestParams() // ExpandRequestParams | 
+    body := *openapiclient.NewExpandRequest() // ExpandRequest | 
 
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.Expand(context.Background()).Params(params).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.Expand(context.Background()).Body(body).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Expand``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
         switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
+        case FgaApiAuthenticationError:
             // Handle authentication error
-        case Auth0FgaApiValidationError:
+        case FgaApiValidationError:
             // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
+        case FgaApiNotFoundError:
             // Handle not found error
-        case Auth0FgaApiInternalError:
+        case FgaApiInternalError:
             // Handle API internal error
-        case Auth0FgaApiRateLimitError:
+        case FgaApiRateLimitError:
             // Exponential backoff in handling rate limit error
         default:
             // Handle unknown/undefined error
@@ -272,7 +181,7 @@ Other parameters are passed through a pointer to a apiExpandRequest struct via t
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**params** | [**ExpandRequestParams**](ExpandRequestParams.md) |  | 
+**body** | [**ExpandRequest**](ExpandRequest.md) |  | 
 
 ### Return type
 
@@ -294,7 +203,7 @@ Name | Type | Description  | Notes
 
 ## Read
 
-> ReadResponse Read(ctx).Params(params).Execute()
+> ReadResponse Read(ctx).Body(body).Execute()
 
 Get tuples from the store that matches a query, without following userset rewrite rules
 
@@ -314,31 +223,32 @@ import (
 
 func main() {
     
-    params := *openapiclient.NewReadRequestParams() // ReadRequestParams | 
+    body := *openapiclient.NewReadRequest() // ReadRequest | 
 
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.Read(context.Background()).Params(params).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.Read(context.Background()).Body(body).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Read``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
         switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
+        case FgaApiAuthenticationError:
             // Handle authentication error
-        case Auth0FgaApiValidationError:
+        case FgaApiValidationError:
             // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
+        case FgaApiNotFoundError:
             // Handle not found error
-        case Auth0FgaApiInternalError:
+        case FgaApiInternalError:
             // Handle API internal error
-        case Auth0FgaApiRateLimitError:
+        case FgaApiRateLimitError:
             // Exponential backoff in handling rate limit error
         default:
             // Handle unknown/undefined error
@@ -363,7 +273,7 @@ Other parameters are passed through a pointer to a apiReadRequest struct via the
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**params** | [**ReadRequestParams**](ReadRequestParams.md) |  | 
+**body** | [**ReadRequest**](ReadRequest.md) |  | 
 
 ### Return type
 
@@ -407,11 +317,12 @@ func main() {
     
     authorizationModelId := "authorizationModelId_example" // string | 
 
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     apiClient := auth0fga.NewAPIClient(configuration)
@@ -421,15 +332,15 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ReadAssertions``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
         switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
+        case FgaApiAuthenticationError:
             // Handle authentication error
-        case Auth0FgaApiValidationError:
+        case FgaApiValidationError:
             // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
+        case FgaApiNotFoundError:
             // Handle not found error
-        case Auth0FgaApiInternalError:
+        case FgaApiInternalError:
             // Handle API internal error
-        case Auth0FgaApiRateLimitError:
+        case FgaApiRateLimitError:
             // Exponential backoff in handling rate limit error
         default:
             // Handle unknown/undefined error
@@ -498,11 +409,12 @@ func main() {
     
     id := "id_example" // string | 
 
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     apiClient := auth0fga.NewAPIClient(configuration)
@@ -512,15 +424,15 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ReadAuthorizationModel``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
         switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
+        case FgaApiAuthenticationError:
             // Handle authentication error
-        case Auth0FgaApiValidationError:
+        case FgaApiValidationError:
             // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
+        case FgaApiNotFoundError:
             // Handle not found error
-        case Auth0FgaApiInternalError:
+        case FgaApiInternalError:
             // Handle API internal error
-        case Auth0FgaApiRateLimitError:
+        case FgaApiRateLimitError:
             // Exponential backoff in handling rate limit error
         default:
             // Handle unknown/undefined error
@@ -590,11 +502,12 @@ func main() {
     pageSize := int32(56) // int32 |  (optional)
     continuationToken := "continuationToken_example" // string |  (optional)
 
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     apiClient := auth0fga.NewAPIClient(configuration)
@@ -604,15 +517,15 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ReadAuthorizationModels``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
         switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
+        case FgaApiAuthenticationError:
             // Handle authentication error
-        case Auth0FgaApiValidationError:
+        case FgaApiValidationError:
             // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
+        case FgaApiNotFoundError:
             // Handle not found error
-        case Auth0FgaApiInternalError:
+        case FgaApiInternalError:
             // Handle API internal error
-        case Auth0FgaApiRateLimitError:
+        case FgaApiRateLimitError:
             // Exponential backoff in handling rate limit error
         default:
             // Handle unknown/undefined error
@@ -684,11 +597,12 @@ func main() {
     pageSize := int32(56) // int32 |  (optional)
     continuationToken := "continuationToken_example" // string |  (optional)
 
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     apiClient := auth0fga.NewAPIClient(configuration)
@@ -698,15 +612,15 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ReadChanges``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
         switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
+        case FgaApiAuthenticationError:
             // Handle authentication error
-        case Auth0FgaApiValidationError:
+        case FgaApiValidationError:
             // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
+        case FgaApiNotFoundError:
             // Handle not found error
-        case Auth0FgaApiInternalError:
+        case FgaApiInternalError:
             // Handle API internal error
-        case Auth0FgaApiRateLimitError:
+        case FgaApiRateLimitError:
             // Exponential backoff in handling rate limit error
         default:
             // Handle unknown/undefined error
@@ -753,98 +667,9 @@ Name | Type | Description  | Notes
 [[Back to README]](../README.md)
 
 
-## ReadSettings
-
-> ReadSettingsResponse ReadSettings(ctx).Execute()
-
-Return store settings, including the environment tag
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    auth0fga "github.com/auth0-lab/fga-go-sdk"
-)
-
-func main() {
-    
-
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
-        StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
-    })
-
-    apiClient := auth0fga.NewAPIClient(configuration)
-
-    resp, r, err := apiClient.Auth0FgaApi.ReadSettings(context.Background()).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ReadSettings``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-        switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
-            // Handle authentication error
-        case Auth0FgaApiValidationError:
-            // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
-            // Handle not found error
-        case Auth0FgaApiInternalError:
-            // Handle API internal error
-        case Auth0FgaApiRateLimitError:
-            // Exponential backoff in handling rate limit error
-        default:
-            // Handle unknown/undefined error
-        }
-    }
-    // response from `ReadSettings`: ReadSettingsResponse
-    fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.ReadSettings`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiReadSettingsRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-### Return type
-
-[**ReadSettingsResponse**](ReadSettingsResponse.md)
-
-### Authorization
-
-[ClientCredentials](../README.md#ClientCredentials)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
 ## Write
 
-> map[string]interface{} Write(ctx).Params(params).Execute()
+> map[string]interface{} Write(ctx).Body(body).Execute()
 
 Add or delete tuples from the store
 
@@ -864,31 +689,32 @@ import (
 
 func main() {
     
-    params := *openapiclient.NewWriteRequestParams() // WriteRequestParams | 
+    body := *openapiclient.NewWriteRequest() // WriteRequest | 
 
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.Write(context.Background()).Params(params).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(body).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.Write``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
         switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
+        case FgaApiAuthenticationError:
             // Handle authentication error
-        case Auth0FgaApiValidationError:
+        case FgaApiValidationError:
             // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
+        case FgaApiNotFoundError:
             // Handle not found error
-        case Auth0FgaApiInternalError:
+        case FgaApiInternalError:
             // Handle API internal error
-        case Auth0FgaApiRateLimitError:
+        case FgaApiRateLimitError:
             // Exponential backoff in handling rate limit error
         default:
             // Handle unknown/undefined error
@@ -913,7 +739,7 @@ Other parameters are passed through a pointer to a apiWriteRequest struct via th
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**params** | [**WriteRequestParams**](WriteRequestParams.md) |  | 
+**body** | [**WriteRequest**](WriteRequest.md) |  | 
 
 ### Return type
 
@@ -935,7 +761,7 @@ Name | Type | Description  | Notes
 
 ## WriteAssertions
 
-> WriteAssertions(ctx, authorizationModelId).Params(params).Execute()
+> WriteAssertions(ctx, authorizationModelId).Body(body).Execute()
 
 Upsert assertions for an authorization model ID
 
@@ -956,31 +782,32 @@ import (
 func main() {
     
     authorizationModelId := "authorizationModelId_example" // string | 
-    params := *openapiclient.NewWriteAssertionsRequestParams([]openapiclient.Assertion{*openapiclient.NewAssertion(false)}) // WriteAssertionsRequestParams | 
+    body := *openapiclient.NewWriteAssertionsRequest([]openapiclient.Assertion{*openapiclient.NewAssertion(false)}) // WriteAssertionsRequest | 
 
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.WriteAssertions(context.Background(), authorizationModelId).Params(params).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.WriteAssertions(context.Background(), authorizationModelId).Body(body).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteAssertions``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
         switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
+        case FgaApiAuthenticationError:
             // Handle authentication error
-        case Auth0FgaApiValidationError:
+        case FgaApiValidationError:
             // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
+        case FgaApiNotFoundError:
             // Handle not found error
-        case Auth0FgaApiInternalError:
+        case FgaApiInternalError:
             // Handle API internal error
-        case Auth0FgaApiRateLimitError:
+        case FgaApiRateLimitError:
             // Exponential backoff in handling rate limit error
         default:
             // Handle unknown/undefined error
@@ -1004,7 +831,7 @@ Other parameters are passed through a pointer to a apiWriteAssertionsRequest str
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**params** | [**WriteAssertionsRequestParams**](WriteAssertionsRequestParams.md) |  | 
+**body** | [**WriteAssertionsRequest**](WriteAssertionsRequest.md) |  | 
 
 ### Return type
 
@@ -1048,11 +875,12 @@ func main() {
     
     typeDefinitions := *openapiclient.NewTypeDefinitions() // TypeDefinitions | 
 
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     apiClient := auth0fga.NewAPIClient(configuration)
@@ -1062,15 +890,15 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteAuthorizationModel``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
         switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
+        case FgaApiAuthenticationError:
             // Handle authentication error
-        case Auth0FgaApiValidationError:
+        case FgaApiValidationError:
             // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
+        case FgaApiNotFoundError:
             // Handle not found error
-        case Auth0FgaApiInternalError:
+        case FgaApiInternalError:
             // Handle API internal error
-        case Auth0FgaApiRateLimitError:
+        case FgaApiRateLimitError:
             // Exponential backoff in handling rate limit error
         default:
             // Handle unknown/undefined error
@@ -1100,188 +928,6 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**WriteAuthorizationModelResponse**](WriteAuthorizationModelResponse.md)
-
-### Authorization
-
-[ClientCredentials](../README.md#ClientCredentials)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## WriteSettings
-
-> WriteSettingsResponse WriteSettings(ctx).Params(params).Execute()
-
-Update the environment tag for a store
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    auth0fga "github.com/auth0-lab/fga-go-sdk"
-)
-
-func main() {
-    
-    params := *openapiclient.NewWriteSettingsRequestParams() // WriteSettingsRequestParams | 
-
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
-        StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
-    })
-
-    apiClient := auth0fga.NewAPIClient(configuration)
-
-    resp, r, err := apiClient.Auth0FgaApi.WriteSettings(context.Background()).Params(params).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteSettings``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-        switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
-            // Handle authentication error
-        case Auth0FgaApiValidationError:
-            // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
-            // Handle not found error
-        case Auth0FgaApiInternalError:
-            // Handle API internal error
-        case Auth0FgaApiRateLimitError:
-            // Exponential backoff in handling rate limit error
-        default:
-            // Handle unknown/undefined error
-        }
-    }
-    // response from `WriteSettings`: WriteSettingsResponse
-    fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.WriteSettings`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiWriteSettingsRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**params** | [**WriteSettingsRequestParams**](WriteSettingsRequestParams.md) |  | 
-
-### Return type
-
-[**WriteSettingsResponse**](WriteSettingsResponse.md)
-
-### Authorization
-
-[ClientCredentials](../README.md#ClientCredentials)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## WriteTokenIssuer
-
-> WriteTokenIssuersResponse WriteTokenIssuer(ctx).Params(params).Execute()
-
-Add 3rd party token issuer for Auth0 FGA read and write operations
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    auth0fga "github.com/auth0-lab/fga-go-sdk"
-)
-
-func main() {
-    
-    params := *openapiclient.NewWriteTokenIssuersRequestParams() // WriteTokenIssuersRequestParams | 
-
-    configuration := auth0fga.NewConfiguration(UserConfiguration{
-        StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
-    })
-
-    apiClient := auth0fga.NewAPIClient(configuration)
-
-    resp, r, err := apiClient.Auth0FgaApi.WriteTokenIssuer(context.Background()).Params(params).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteTokenIssuer``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-        switch v := err.(type) {
-        case Auth0FgaApiAuthenticationError:
-            // Handle authentication error
-        case Auth0FgaApiValidationError:
-            // Handle parameter validation error
-        case Auth0FgaApiNotFoundError:
-            // Handle not found error
-        case Auth0FgaApiInternalError:
-            // Handle API internal error
-        case Auth0FgaApiRateLimitError:
-            // Exponential backoff in handling rate limit error
-        default:
-            // Handle unknown/undefined error
-        }
-    }
-    // response from `WriteTokenIssuer`: WriteTokenIssuersResponse
-    fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.WriteTokenIssuer`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiWriteTokenIssuerRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**params** | [**WriteTokenIssuersRequestParams**](WriteTokenIssuersRequestParams.md) |  | 
-
-### Return type
-
-[**WriteTokenIssuersResponse**](WriteTokenIssuersResponse.md)
 
 ### Authorization
 

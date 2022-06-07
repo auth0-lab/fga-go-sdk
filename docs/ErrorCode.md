@@ -31,10 +31,6 @@
 
 * `INVALID_OBJECT_FORMAT` (value: `"invalid_object_format"`)
 
-* `IMMUTABLE_STORE` (value: `"immutable_store"`)
-
-* `MAX_NUMBER_TOKEN_ISSUERS` (value: `"max_number_token_issuers"`)
-
 * `TOKEN_ISSUER_ALREADY_REGISTERED` (value: `"token_issuer_already_registered"`)
 
 * `TOS_AGREEMENT_ALREADY_SIGNED` (value: `"tos_agreement_already_signed"`)
@@ -42,8 +38,6 @@
 * `WRITE_FAILED_DUE_TO_INVALID_INPUT` (value: `"write_failed_due_to_invalid_input"`)
 
 * `AUTHORIZATION_MODEL_ASSERTIONS_NOT_FOUND` (value: `"authorization_model_assertions_not_found"`)
-
-* `SETTINGS_NOT_FOUND` (value: `"settings_not_found"`)
 
 * `LATEST_AUTHORIZATION_MODEL_NOT_FOUND` (value: `"latest_authorization_model_not_found"`)
 
@@ -53,8 +47,6 @@
 
 * `EMPTY_RELATION_DEFINITION` (value: `"empty_relation_definition"`)
 
-* `TOO_MANY_TYPES` (value: `"too_many_types"`)
-
 * `INVALID_USER` (value: `"invalid_user"`)
 
 * `INVALID_TOKEN_ISSUER` (value: `"invalid_token_issuer"`)
@@ -62,8 +54,6 @@
 * `INVALID_TUPLE` (value: `"invalid_tuple"`)
 
 * `UNKNOWN_RELATION` (value: `"unknown_relation"`)
-
-* `MAX_CLIENTS_EXCEEDED` (value: `"max_clients_exceeded"`)
 
 * `STORE_ID_INVALID_LENGTH` (value: `"store_id_invalid_length"`)
 
@@ -111,7 +101,11 @@
 
 * `QUERY_STRING_TYPE_CONTINUATION_TOKEN_MISMATCH` (value: `"query_string_type_continuation_token_mismatch"`)
 
-* `WRITE_OPERATIONS_EXCEEDED_BATCH_LIMIT` (value: `"write_operations_exceeded_batch_limit"`)
+* `EXCEEDED_ENTITY_LIMIT` (value: `"exceeded_entity_limit"`)
+
+* `INVALID_CONTEXTUAL_TUPLE` (value: `"invalid_contextual_tuple"`)
+
+* `DUPLICATE_CONTEXTUAL_TUPLE` (value: `"duplicate_contextual_tuple"`)
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -8,7 +8,7 @@ Warning: This SDK comes with no SLAs and is not production-ready!
 
 ## Table of Contents
 
-- [About Auth0 Fine Grained Authorization](#about-auth0-fine-grained-authorization)
+- [About Auth0 Fine Grained Authorization (FGA)](#about)
 - [Resources](#resources)
 - [Installation](#installation)
 - [Getting Started](#getting-started)
@@ -31,22 +31,26 @@ Warning: This SDK comes with no SLAs and is not production-ready!
   - [Pull Requests](#pull-requests) [Note: We are not accepting Pull Requests at this time!]
 - [License](#license)
 
-## About Auth0 Fine Grained Authorization
+## <a id="about"></a>About Auth0 Fine Grained Authorization (FGA)
 
-[Auth0 Fine Grained Authorization (FGA)](https://dashboard.fga.dev) is the  early-stage product we are building at Auth0 as part of [Auth0Lab](https://twitter.com/Auth0Lab/) to solve fine-grained authorization at scale.
-If you are interested in learning more about our plans, please reach out via our <a target="_blank" href="https://discord.gg/8naAwJfWN6" rel="noreferrer">Discord chat</a>.
+[Auth0 Fine Grained Authorization (FGA)](https://fga.dev) is an open source Fine-Grained Authorization solution inspired by [Google's Zanzibar paper](https://research.google/pubs/pub48190/). It was created by the FGA team at [Auth0](https://auth0.com) based on [Auth0 Fine-Grained Authorization (FGA)](https://fga.dev), available under [a permissive license (Apache-2)](https://github.com/auth0-lab/rfcs/blob/main/LICENSE) and welcomes community contributions.
 
-Please note:
-* At this point in time, Auth0 Fine Grained Authorization does not come with any SLAs; availability and uptime are not guaranteed.
-* While this project is in its early stages, the SDK methods are in flux and might change without a major bump
+Auth0 Fine Grained Authorization (FGA) is designed to make it easy for application builders to model their permission layer, and to add and integrate fine-grained authorization into their applications. Auth0 Fine Grained Authorization (FGA)’s design is optimized for reliability and low latency at a high scale.
+
+It allows in-memory data storage for quick development, as well as pluggable database modules - with initial support for PostgreSQL.
+
+It offers an [HTTP API](https://docs.fga.dev/api) and has SDKs for programming languages including [Node.js/JavaScript](https://github.com/auth0-lab/js-sdk), [GoLang](https://github.com/auth0-lab/go-sdk) and [.NET](https://github.com/auth0-lab/dotnet-sdk).
+
+More SDKs and integrations such as Rego are planned for the future.
 
 ## Resources
 
-- [The Auth0 FGA Playground](https://play.fga.dev)
-- [The Auth0 FGA Documentation](https://docs.fga.dev)
+- [Auth0 Fine Grained Authorization (FGA) Documentation](https://docs.fga.dev)
+- [Auth0 Fine Grained Authorization (FGA) API Documentation](https://docs.fga.dev/api)
+- [Twitter](https://twitter.com/auth0-lab)
+- [Auth0 Fine Grained Authorization (FGA) Discord Community](https://discord.gg/8naAwJfWN6)
 - [Zanzibar Academy](https://zanzibar.academy)
-- [Auth0Lab on Twitter](https://twitter.com/Auth0Lab/)
-- [Discord Community](https://discord.gg/pvbNmqC)
+- [Google's Zanzibar Paper (2019)](https://research.google/pubs/pub48190/)
 
 ## Installation
 
@@ -86,11 +90,12 @@ import (
 )
 
 func Main() {
-    configuration, err := auth0fga.NewConfiguration(auth0fga.UserConfiguration{
-        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"),
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
         StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
-        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"),
-        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
     })
 
     if err != nil {
@@ -100,6 +105,7 @@ func Main() {
     apiClient := auth0fga.NewAPIClient(configuration)
 }
 ```
+
 
 ### Getting your Store ID, Client ID and Client Secret
 
@@ -121,11 +127,11 @@ In the playground environment, you do not need to provide a client id and client
 
 #### Write Authorization Model
 
-[API Documentation](https://docs.fga.dev/api/service#/Store Models/auth0_fga_WriteAuthorizationModel)
+[API Documentation](https://docs.fga.dev/api#/Store%20Models/WriteAuthorizationModel)
 
-> Note: To learn how to build your authorization model, check the Docs at https://docs.fga.dev/
+> Note: To learn how to build your authorization model, check the Docs at https://docs.fga.dev.
 
-> Note: The Auth0 FGA Playground, Dashboard and Documentation use a friendly syntax which gets translated to the API syntax seen below. Learn more about [the Auth0 FGA configuration language](https://docs.fga.dev/modeling/configuration-language).
+> Learn more about [the Auth0 Fine Grained Authorization (FGA) configuration language](https://docs.fga.dev/modeling/configuration-language).
 
 ```golang
 body  := auth0fga.TypeDefinitions{TypeDefinitions: &[]auth0fga.TypeDefinition{
@@ -152,7 +158,7 @@ fmt.Printf("%s", data.AuthorizationModelId) // 1uHxCSuTP0VKPYSnkq1pbb1jeZw
 
 #### Read a Single Authorization Model
 
-[API Documentation](https://docs.fga.dev/api/service#/Store Models/auth0_fga_ReadAuthorizationModel)
+[API Documentation](https://docs.fga.dev/api#/Store%20Models/ReadAuthorizationModel)
 
 ```golang
 // Assuming `1uHxCSuTP0VKPYSnkq1pbb1jeZw` is an id of a single model
@@ -165,7 +171,7 @@ fmt.Printf("%s", data.AuthorizationModel.Id) // 1uHxCSuTP0VKPYSnkq1pbb1jeZw
 
 #### Read Authorization Model IDs
 
-[API Documentation](https://docs.fga.dev/api/service#/Store Models/auth0_fga_ReadAuthorizationModels)
+[API Documentation](https://docs.fga.dev/api#/Store%20Models/ReadAuthorizationModels)
 
 ```golang
 data, response, err := apiClient.Auth0FgaApi.ReadAuthorizationModels(context.Background()).Execute()
@@ -177,12 +183,12 @@ fmt.Printf("%s", (*data.AuthorizationModelIds)[0]) // 1uHxCSuTP0VKPYSnkq1pbb1jeZ
 
 #### Check
 
-[API Documentation](https://docs.fga.dev/api/service#/Tuples/auth0_fga_Check)
+[API Documentation](https://docs.fga.dev/api#/Tuples/Check)
 
-> Provide a tuple and ask the Auth0 FGA API to check for a relationship
+> Provide a tuple and ask the Auth0 Fine Grained Authorization (FGA) API to check for a relationship
 
 ```golang
-body := auth0fga.CheckRequestParams{
+body := auth0fga.CheckRequest{
 	TupleKey: &auth0fga.TupleKey{
 		User: auth0fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
 		Relation: auth0fga.PtrString("admin"),
@@ -199,10 +205,10 @@ fmt.Printf("%t", *data.Allowed) // True
 
 #### Write Tuples
 
-[API Documentation](https://docs.fga.dev/api/service#/Tuples/auth0_fga_Write)
+[API Documentation](https://docs.fga.dev/api#/Tuples/Write)
 
 ```golang
-body := auth0fga.WriteRequestParams{
+body := auth0fga.WriteRequest{
 	Writes: &auth0fga.TupleKeys{
 		TupleKeys: []auth0fga.TupleKey{
 			{
@@ -219,10 +225,10 @@ _, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(body)
 
 #### Delete Tuples
 
-[API Documentation](https://docs.fga.dev/api/service#/Tuples/auth0_fga_Write)
+[API Documentation](https://docs.fga.dev/api#/Tuples/Write)
 
 ```golang
-body := auth0fga.WriteRequestParams{
+body := auth0fga.WriteRequest{
 	Deletes: &auth0fga.TupleKeys{
 		TupleKeys: []auth0fga.TupleKey{
 			{
@@ -239,10 +245,10 @@ _, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(body)
 
 #### Expand
 
-[API Documentation](https://docs.fga.dev/api/service#/Debugging/auth0_fga_Expand)
+[API Documentation](https://docs.fga.dev/api#/Debugging/Expand)
 
 ```golang
-body := auth0fga.ExpandRequestParams{
+body := auth0fga.ExpandRequest{
 	TupleKey: &auth0fga.TupleKey{
 		Relation: auth0fga.PtrString("admin"),
 		Object: auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
@@ -255,11 +261,11 @@ data, response, err := apiClient.Auth0FgaApi.Expand(context.Background()).Body(b
 
 #### Read
 
-[API Documentation](https://docs.fga.dev/api/service#/Tuples/auth0_fga_Read)
+[API Documentation](https://docs.fga.dev/api#/Tuples/Read)
 
 ```golang
 // Find if a relationship tuple stating that a certain user is an admin on a certain workspace
-body := auth0fga.ReadRequestParams{
+body := auth0fga.ReadRequest{
     TupleKey: &auth0fga.TupleKey{
         User:     auth0fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
         Relation: auth0fga.PtrString("admin"),
@@ -268,7 +274,7 @@ body := auth0fga.ReadRequestParams{
 }
 
 // Find all relationship tuples where a certain user has a relationship as any relation to a certain workspace
-body := auth0fga.ReadRequestParams{
+body := auth0fga.ReadRequest{
     TupleKey: &auth0fga.TupleKey{
         User:     auth0fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
         Object:   auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
@@ -276,7 +282,7 @@ body := auth0fga.ReadRequestParams{
 }
 
 // Find all relationship tuples where a certain user is an admin on any workspace
-body := auth0fga.ReadRequestParams{
+body := auth0fga.ReadRequest{
     TupleKey: &auth0fga.TupleKey{
         User:     auth0fga.PtrString("81684243-9356-4421-8fbf-a4f8d36aa31b"),
         Relation: auth0fga.PtrString("admin"),
@@ -285,7 +291,7 @@ body := auth0fga.ReadRequestParams{
 }
 
 // Find all relationship tuples where any user has a relationship as any relation with a particular workspace
-body := auth0fga.ReadRequestParams{
+body := auth0fga.ReadRequest{
     TupleKey: &auth0fga.TupleKey{
         Object:   auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
     },
@@ -299,7 +305,7 @@ data, response, err := apiClient.Auth0FgaApi.Read(context.Background()).Body(bod
 
 #### Read Changes (Watch)
 
-[API Documentation](https://docs.fga.dev/api/service#/Tuples/auth0_fga_ReadChanges)
+[API Documentation](https://docs.fga.dev/api#/Tuples/ReadChanges)
 
 ```golang
 data, response, err := apiClient.Auth0FgaApi.ReadChanges(context.Background()).
@@ -321,19 +327,15 @@ data, response, err := apiClient.Auth0FgaApi.ReadChanges(context.Background()).
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *Auth0FgaApi* | [**Check**](docs/Auth0FgaApi.md#check) | **Post** /stores/{store_id}/check | Check whether a user is authorized to access an object
-*Auth0FgaApi* | [**DeleteTokenIssuer**](docs/Auth0FgaApi.md#deletetokenissuer) | **Delete** /stores/{store_id}/settings/token-issuers/{id} | Remove 3rd party token issuer for Auth0 FGA read and write operations
 *Auth0FgaApi* | [**Expand**](docs/Auth0FgaApi.md#expand) | **Post** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
 *Auth0FgaApi* | [**Read**](docs/Auth0FgaApi.md#read) | **Post** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 *Auth0FgaApi* | [**ReadAssertions**](docs/Auth0FgaApi.md#readassertions) | **Get** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
 *Auth0FgaApi* | [**ReadAuthorizationModel**](docs/Auth0FgaApi.md#readauthorizationmodel) | **Get** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
 *Auth0FgaApi* | [**ReadAuthorizationModels**](docs/Auth0FgaApi.md#readauthorizationmodels) | **Get** /stores/{store_id}/authorization-models | Return all the authorization model IDs for a particular store
 *Auth0FgaApi* | [**ReadChanges**](docs/Auth0FgaApi.md#readchanges) | **Get** /stores/{store_id}/changes | Return a list of all the tuple changes
-*Auth0FgaApi* | [**ReadSettings**](docs/Auth0FgaApi.md#readsettings) | **Get** /stores/{store_id}/settings | Return store settings, including the environment tag
 *Auth0FgaApi* | [**Write**](docs/Auth0FgaApi.md#write) | **Post** /stores/{store_id}/write | Add or delete tuples from the store
 *Auth0FgaApi* | [**WriteAssertions**](docs/Auth0FgaApi.md#writeassertions) | **Put** /stores/{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
 *Auth0FgaApi* | [**WriteAuthorizationModel**](docs/Auth0FgaApi.md#writeauthorizationmodel) | **Post** /stores/{store_id}/authorization-models | Create a new authorization model
-*Auth0FgaApi* | [**WriteSettings**](docs/Auth0FgaApi.md#writesettings) | **Patch** /stores/{store_id}/settings | Update the environment tag for a store
-*Auth0FgaApi* | [**WriteTokenIssuer**](docs/Auth0FgaApi.md#writetokenissuer) | **Post** /stores/{store_id}/settings/token-issuers | Add 3rd party token issuer for Auth0 FGA read and write operations
 
 
 ### Models
@@ -343,18 +345,20 @@ Class | Method | HTTP request | Description
  - [AuthErrorCode](docs/AuthErrorCode.md)
  - [AuthenticationErrorMessageResponse](docs/AuthenticationErrorMessageResponse.md)
  - [AuthorizationModel](docs/AuthorizationModel.md)
- - [AuthorizationmodelDifference](docs/AuthorizationmodelDifference.md)
- - [AuthorizationmodelTupleToUserset](docs/AuthorizationmodelTupleToUserset.md)
- - [CheckRequestParams](docs/CheckRequestParams.md)
+ - [CheckRequest](docs/CheckRequest.md)
  - [CheckResponse](docs/CheckResponse.md)
  - [Computed](docs/Computed.md)
- - [Environment](docs/Environment.md)
+ - [ContextualTupleKeys](docs/ContextualTupleKeys.md)
+ - [CreateStoreResponse](docs/CreateStoreResponse.md)
+ - [Difference](docs/Difference.md)
  - [ErrorCode](docs/ErrorCode.md)
- - [ExpandRequestParams](docs/ExpandRequestParams.md)
+ - [ExpandRequest](docs/ExpandRequest.md)
  - [ExpandResponse](docs/ExpandResponse.md)
+ - [GetStoreResponse](docs/GetStoreResponse.md)
  - [InternalErrorCode](docs/InternalErrorCode.md)
  - [InternalErrorMessageResponse](docs/InternalErrorMessageResponse.md)
  - [Leaf](docs/Leaf.md)
+ - [ListStoresResponse](docs/ListStoresResponse.md)
  - [Node](docs/Node.md)
  - [Nodes](docs/Nodes.md)
  - [NotFoundErrorCode](docs/NotFoundErrorCode.md)
@@ -364,18 +368,18 @@ Class | Method | HTTP request | Description
  - [ReadAuthorizationModelResponse](docs/ReadAuthorizationModelResponse.md)
  - [ReadAuthorizationModelsResponse](docs/ReadAuthorizationModelsResponse.md)
  - [ReadChangesResponse](docs/ReadChangesResponse.md)
- - [ReadRequestParams](docs/ReadRequestParams.md)
+ - [ReadRequest](docs/ReadRequest.md)
  - [ReadResponse](docs/ReadResponse.md)
- - [ReadSettingsResponse](docs/ReadSettingsResponse.md)
  - [ResourceExhaustedErrorCode](docs/ResourceExhaustedErrorCode.md)
  - [ResourceExhaustedErrorMessageResponse](docs/ResourceExhaustedErrorMessageResponse.md)
  - [Status](docs/Status.md)
- - [TokenIssuer](docs/TokenIssuer.md)
+ - [Store](docs/Store.md)
  - [Tuple](docs/Tuple.md)
  - [TupleChange](docs/TupleChange.md)
  - [TupleKey](docs/TupleKey.md)
  - [TupleKeys](docs/TupleKeys.md)
  - [TupleOperation](docs/TupleOperation.md)
+ - [TupleToUserset](docs/TupleToUserset.md)
  - [TypeDefinition](docs/TypeDefinition.md)
  - [TypeDefinitions](docs/TypeDefinitions.md)
  - [Users](docs/Users.md)
@@ -385,22 +389,16 @@ Class | Method | HTTP request | Description
  - [UsersetTreeTupleToUserset](docs/UsersetTreeTupleToUserset.md)
  - [Usersets](docs/Usersets.md)
  - [ValidationErrorMessageResponse](docs/ValidationErrorMessageResponse.md)
- - [WriteAssertionsRequestParams](docs/WriteAssertionsRequestParams.md)
+ - [WriteAssertionsRequest](docs/WriteAssertionsRequest.md)
  - [WriteAuthorizationModelResponse](docs/WriteAuthorizationModelResponse.md)
- - [WriteRequestParams](docs/WriteRequestParams.md)
- - [WriteSettingsRequestParams](docs/WriteSettingsRequestParams.md)
- - [WriteSettingsResponse](docs/WriteSettingsResponse.md)
- - [WriteTokenIssuersRequestParams](docs/WriteTokenIssuersRequestParams.md)
- - [WriteTokenIssuersResponse](docs/WriteTokenIssuersResponse.md)
+ - [WriteRequest](docs/WriteRequest.md)
 
 
 ## Contributing
 
 ### Issues
 
-If you have found a bug or if you have a feature request, please report them at this repository [issues](https://github.com/auth0-lab/fga-go-sdk/issues) section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/responsible-disclosure-policy) details the procedure for disclosing security issues.
-
-For auth0 related questions/support please use the [Support Center](https://support.auth0.com).
+If you have found a bug or if you have a feature request, please report them at this repository [issues](https://github.com/auth0-lab/fga-go-sdk/issues) section. Please do not report security vulnerabilities on the public GitHub issue tracker.
 
 ### Pull Requests
 
@@ -408,7 +406,7 @@ Pull Requests are not currently open, please [raise an issue](https://github.com
 
 ## Author
 
-[Auth0Lab](https://github.com/auth0-lab)
+[Auth0 FGA](https://github.com/auth0-lab)
 
 ## License
 

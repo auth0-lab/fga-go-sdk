@@ -13,6 +13,8 @@
 
 * `STORE_CLIENT_ID_NOT_FOUND` (value: `"store_client_id_not_found"`)
 
+* `RESOURCE_NOT_FOUND` (value: `"resource_not_found"`)
+
 * `UNIMPLEMENTED` (value: `"unimplemented"`)
 
 

@@ -16,31 +16,31 @@ import (
 	"encoding/json"
 )
 
-// TupleKeys struct for TupleKeys
-type TupleKeys struct {
+// ContextualTupleKeys struct for ContextualTupleKeys
+type ContextualTupleKeys struct {
 	TupleKeys []TupleKey `json:"tuple_keys"`
 }
 
-// NewTupleKeys instantiates a new TupleKeys object
+// NewContextualTupleKeys instantiates a new ContextualTupleKeys object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTupleKeys(tupleKeys []TupleKey) *TupleKeys {
-	this := TupleKeys{}
+func NewContextualTupleKeys(tupleKeys []TupleKey) *ContextualTupleKeys {
+	this := ContextualTupleKeys{}
 	this.TupleKeys = tupleKeys
 	return &this
 }
 
-// NewTupleKeysWithDefaults instantiates a new TupleKeys object
+// NewContextualTupleKeysWithDefaults instantiates a new ContextualTupleKeys object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewTupleKeysWithDefaults() *TupleKeys {
-	this := TupleKeys{}
+func NewContextualTupleKeysWithDefaults() *ContextualTupleKeys {
+	this := ContextualTupleKeys{}
 	return &this
 }
 
 // GetTupleKeys returns the TupleKeys field value
-func (o *TupleKeys) GetTupleKeys() []TupleKey {
+func (o *ContextualTupleKeys) GetTupleKeys() []TupleKey {
 	if o == nil {
 		var ret []TupleKey
 		return ret
@@ -51,7 +51,7 @@ func (o *TupleKeys) GetTupleKeys() []TupleKey {
 
 // GetTupleKeysOk returns a tuple with the TupleKeys field value
 // and a boolean to check if the value has been set.
-func (o *TupleKeys) GetTupleKeysOk() (*[]TupleKey, bool) {
+func (o *ContextualTupleKeys) GetTupleKeysOk() (*[]TupleKey, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -59,11 +59,11 @@ func (o *TupleKeys) GetTupleKeysOk() (*[]TupleKey, bool) {
 }
 
 // SetTupleKeys sets field value
-func (o *TupleKeys) SetTupleKeys(v []TupleKey) {
+func (o *ContextualTupleKeys) SetTupleKeys(v []TupleKey) {
 	o.TupleKeys = v
 }
 
-func (o TupleKeys) MarshalJSON() ([]byte, error) {
+func (o ContextualTupleKeys) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["tuple_keys"] = o.TupleKeys
@@ -71,38 +71,38 @@ func (o TupleKeys) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableTupleKeys struct {
-	value *TupleKeys
+type NullableContextualTupleKeys struct {
+	value *ContextualTupleKeys
 	isSet bool
 }
 
-func (v NullableTupleKeys) Get() *TupleKeys {
+func (v NullableContextualTupleKeys) Get() *ContextualTupleKeys {
 	return v.value
 }
 
-func (v *NullableTupleKeys) Set(val *TupleKeys) {
+func (v *NullableContextualTupleKeys) Set(val *ContextualTupleKeys) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableTupleKeys) IsSet() bool {
+func (v NullableContextualTupleKeys) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableTupleKeys) Unset() {
+func (v *NullableContextualTupleKeys) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableTupleKeys(val *TupleKeys) *NullableTupleKeys {
-	return &NullableTupleKeys{value: val, isSet: true}
+func NewNullableContextualTupleKeys(val *ContextualTupleKeys) *NullableContextualTupleKeys {
+	return &NullableContextualTupleKeys{value: val, isSet: true}
 }
 
-func (v NullableTupleKeys) MarshalJSON() ([]byte, error) {
+func (v NullableContextualTupleKeys) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableTupleKeys) UnmarshalJSON(src []byte) error {
+func (v *NullableContextualTupleKeys) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

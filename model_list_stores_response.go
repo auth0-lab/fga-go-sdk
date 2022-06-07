@@ -16,63 +16,63 @@ import (
 	"encoding/json"
 )
 
-// ReadResponse struct for ReadResponse
-type ReadResponse struct {
-	Tuples            *[]Tuple `json:"tuples,omitempty"`
+// ListStoresResponse struct for ListStoresResponse
+type ListStoresResponse struct {
+	Stores            *[]Store `json:"stores,omitempty"`
 	ContinuationToken *string  `json:"continuation_token,omitempty"`
 }
 
-// NewReadResponse instantiates a new ReadResponse object
+// NewListStoresResponse instantiates a new ListStoresResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewReadResponse() *ReadResponse {
-	this := ReadResponse{}
+func NewListStoresResponse() *ListStoresResponse {
+	this := ListStoresResponse{}
 	return &this
 }
 
-// NewReadResponseWithDefaults instantiates a new ReadResponse object
+// NewListStoresResponseWithDefaults instantiates a new ListStoresResponse object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewReadResponseWithDefaults() *ReadResponse {
-	this := ReadResponse{}
+func NewListStoresResponseWithDefaults() *ListStoresResponse {
+	this := ListStoresResponse{}
 	return &this
 }
 
-// GetTuples returns the Tuples field value if set, zero value otherwise.
-func (o *ReadResponse) GetTuples() []Tuple {
-	if o == nil || o.Tuples == nil {
-		var ret []Tuple
+// GetStores returns the Stores field value if set, zero value otherwise.
+func (o *ListStoresResponse) GetStores() []Store {
+	if o == nil || o.Stores == nil {
+		var ret []Store
 		return ret
 	}
-	return *o.Tuples
+	return *o.Stores
 }
 
-// GetTuplesOk returns a tuple with the Tuples field value if set, nil otherwise
+// GetStoresOk returns a tuple with the Stores field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ReadResponse) GetTuplesOk() (*[]Tuple, bool) {
-	if o == nil || o.Tuples == nil {
+func (o *ListStoresResponse) GetStoresOk() (*[]Store, bool) {
+	if o == nil || o.Stores == nil {
 		return nil, false
 	}
-	return o.Tuples, true
+	return o.Stores, true
 }
 
-// HasTuples returns a boolean if a field has been set.
-func (o *ReadResponse) HasTuples() bool {
-	if o != nil && o.Tuples != nil {
+// HasStores returns a boolean if a field has been set.
+func (o *ListStoresResponse) HasStores() bool {
+	if o != nil && o.Stores != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetTuples gets a reference to the given []Tuple and assigns it to the Tuples field.
-func (o *ReadResponse) SetTuples(v []Tuple) {
-	o.Tuples = &v
+// SetStores gets a reference to the given []Store and assigns it to the Stores field.
+func (o *ListStoresResponse) SetStores(v []Store) {
+	o.Stores = &v
 }
 
 // GetContinuationToken returns the ContinuationToken field value if set, zero value otherwise.
-func (o *ReadResponse) GetContinuationToken() string {
+func (o *ListStoresResponse) GetContinuationToken() string {
 	if o == nil || o.ContinuationToken == nil {
 		var ret string
 		return ret
@@ -82,7 +82,7 @@ func (o *ReadResponse) GetContinuationToken() string {
 
 // GetContinuationTokenOk returns a tuple with the ContinuationToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ReadResponse) GetContinuationTokenOk() (*string, bool) {
+func (o *ListStoresResponse) GetContinuationTokenOk() (*string, bool) {
 	if o == nil || o.ContinuationToken == nil {
 		return nil, false
 	}
@@ -90,7 +90,7 @@ func (o *ReadResponse) GetContinuationTokenOk() (*string, bool) {
 }
 
 // HasContinuationToken returns a boolean if a field has been set.
-func (o *ReadResponse) HasContinuationToken() bool {
+func (o *ListStoresResponse) HasContinuationToken() bool {
 	if o != nil && o.ContinuationToken != nil {
 		return true
 	}
@@ -99,14 +99,14 @@ func (o *ReadResponse) HasContinuationToken() bool {
 }
 
 // SetContinuationToken gets a reference to the given string and assigns it to the ContinuationToken field.
-func (o *ReadResponse) SetContinuationToken(v string) {
+func (o *ListStoresResponse) SetContinuationToken(v string) {
 	o.ContinuationToken = &v
 }
 
-func (o ReadResponse) MarshalJSON() ([]byte, error) {
+func (o ListStoresResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Tuples != nil {
-		toSerialize["tuples"] = o.Tuples
+	if o.Stores != nil {
+		toSerialize["stores"] = o.Stores
 	}
 	if o.ContinuationToken != nil {
 		toSerialize["continuation_token"] = o.ContinuationToken
@@ -114,38 +114,38 @@ func (o ReadResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableReadResponse struct {
-	value *ReadResponse
+type NullableListStoresResponse struct {
+	value *ListStoresResponse
 	isSet bool
 }
 
-func (v NullableReadResponse) Get() *ReadResponse {
+func (v NullableListStoresResponse) Get() *ListStoresResponse {
 	return v.value
 }
 
-func (v *NullableReadResponse) Set(val *ReadResponse) {
+func (v *NullableListStoresResponse) Set(val *ListStoresResponse) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableReadResponse) IsSet() bool {
+func (v NullableListStoresResponse) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableReadResponse) Unset() {
+func (v *NullableListStoresResponse) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableReadResponse(val *ReadResponse) *NullableReadResponse {
-	return &NullableReadResponse{value: val, isSet: true}
+func NewNullableListStoresResponse(val *ListStoresResponse) *NullableListStoresResponse {
+	return &NullableListStoresResponse{value: val, isSet: true}
 }
 
-func (v NullableReadResponse) MarshalJSON() ([]byte, error) {
+func (v NullableListStoresResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableReadResponse) UnmarshalJSON(src []byte) error {
+func (v *NullableListStoresResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

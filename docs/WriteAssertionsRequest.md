@@ -1,4 +1,4 @@
-# WriteAssertionsRequestParams
+# WriteAssertionsRequest
 
 ## Properties
 
@@ -8,39 +8,39 @@ Name | Type | Description | Notes
 
 ## Methods
 
-### NewWriteAssertionsRequestParams
+### NewWriteAssertionsRequest
 
-`func NewWriteAssertionsRequestParams(assertions []Assertion, ) *WriteAssertionsRequestParams`
+`func NewWriteAssertionsRequest(assertions []Assertion, ) *WriteAssertionsRequest`
 
-NewWriteAssertionsRequestParams instantiates a new WriteAssertionsRequestParams object
+NewWriteAssertionsRequest instantiates a new WriteAssertionsRequest object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewWriteAssertionsRequestParamsWithDefaults
+### NewWriteAssertionsRequestWithDefaults
 
-`func NewWriteAssertionsRequestParamsWithDefaults() *WriteAssertionsRequestParams`
+`func NewWriteAssertionsRequestWithDefaults() *WriteAssertionsRequest`
 
-NewWriteAssertionsRequestParamsWithDefaults instantiates a new WriteAssertionsRequestParams object
+NewWriteAssertionsRequestWithDefaults instantiates a new WriteAssertionsRequest object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetAssertions
 
-`func (o *WriteAssertionsRequestParams) GetAssertions() []Assertion`
+`func (o *WriteAssertionsRequest) GetAssertions() []Assertion`
 
 GetAssertions returns the Assertions field if non-nil, zero value otherwise.
 
 ### GetAssertionsOk
 
-`func (o *WriteAssertionsRequestParams) GetAssertionsOk() (*[]Assertion, bool)`
+`func (o *WriteAssertionsRequest) GetAssertionsOk() (*[]Assertion, bool)`
 
 GetAssertionsOk returns a tuple with the Assertions field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAssertions
 
-`func (o *WriteAssertionsRequestParams) SetAssertions(v []Assertion)`
+`func (o *WriteAssertionsRequest) SetAssertions(v []Assertion)`
 
 SetAssertions sets Assertions field to given value.
 
