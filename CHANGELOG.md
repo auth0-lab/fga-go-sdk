@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.5.0
+
+### [0.5.0](https://github.com/auth0-lab/fga-go-sdk/compare/v0.4.0...v0.5.0) (2022-10-13)
+- BREAKING: exported type `TypeDefinitions` is now `WriteAuthorizationModelRequest`
+    Note: This is only a breaking change on the SDK, not the API.
+- Support ListObjects
+    Support for [ListObjects API](https://docs.fga.dev/api/service#/Relationship%20Queries/ListObjects)
+
+    You call the API and receive the list of object ids from a particular type that the user has a certain relation with.
+
+    For example, to find the list of documents that Anne can read:
+
+    ```golang
+    body := auth0fga.ListObjectsRequest{
+        AuthorizationModelId: PtrString(""),
+        User:                 PtrString("user:anne"),
+        Relation:             PtrString("can_view"),
+        Type:                 PtrString("document"),
+    }
+    data, response, err := apiClient.Auth0FgaApi.ListObjects(context.Background()).Body(body).Execute()
+
+    // response.object_ids = ["roadmap"]
+    ```
+- Use [govulncheck](https://go.dev/blog/vuln) in CI to check for issues
+- chore(deps): upgrade dependencies
+- Target go 1.19
+
 ## v0.4.0
 
 ### [0.4.0](https://github.com/auth0-lab/fga-go-sdk/compare/v0.3.0...v0.4.0) (2022-06-07)
