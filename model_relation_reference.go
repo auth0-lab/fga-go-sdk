@@ -16,63 +16,56 @@ import (
 	"encoding/json"
 )
 
-// ObjectRelation struct for ObjectRelation
-type ObjectRelation struct {
-	Object   *string `json:"object,omitempty"`
+// RelationReference RelationReference represents a relation of a particular object type (e.g. 'document#viewer').
+type RelationReference struct {
+	Type     string  `json:"type"`
 	Relation *string `json:"relation,omitempty"`
 }
 
-// NewObjectRelation instantiates a new ObjectRelation object
+// NewRelationReference instantiates a new RelationReference object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewObjectRelation() *ObjectRelation {
-	this := ObjectRelation{}
+func NewRelationReference(type_ string) *RelationReference {
+	this := RelationReference{}
+	this.Type = type_
 	return &this
 }
 
-// NewObjectRelationWithDefaults instantiates a new ObjectRelation object
+// NewRelationReferenceWithDefaults instantiates a new RelationReference object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewObjectRelationWithDefaults() *ObjectRelation {
-	this := ObjectRelation{}
+func NewRelationReferenceWithDefaults() *RelationReference {
+	this := RelationReference{}
 	return &this
 }
 
-// GetObject returns the Object field value if set, zero value otherwise.
-func (o *ObjectRelation) GetObject() string {
-	if o == nil || o.Object == nil {
+// GetType returns the Type field value
+func (o *RelationReference) GetType() string {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Object
+
+	return o.Type
 }
 
-// GetObjectOk returns a tuple with the Object field value if set, nil otherwise
+// GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
-func (o *ObjectRelation) GetObjectOk() (*string, bool) {
-	if o == nil || o.Object == nil {
+func (o *RelationReference) GetTypeOk() (*string, bool) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Object, true
+	return &o.Type, true
 }
 
-// HasObject returns a boolean if a field has been set.
-func (o *ObjectRelation) HasObject() bool {
-	if o != nil && o.Object != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetObject gets a reference to the given string and assigns it to the Object field.
-func (o *ObjectRelation) SetObject(v string) {
-	o.Object = &v
+// SetType sets field value
+func (o *RelationReference) SetType(v string) {
+	o.Type = v
 }
 
 // GetRelation returns the Relation field value if set, zero value otherwise.
-func (o *ObjectRelation) GetRelation() string {
+func (o *RelationReference) GetRelation() string {
 	if o == nil || o.Relation == nil {
 		var ret string
 		return ret
@@ -82,7 +75,7 @@ func (o *ObjectRelation) GetRelation() string {
 
 // GetRelationOk returns a tuple with the Relation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ObjectRelation) GetRelationOk() (*string, bool) {
+func (o *RelationReference) GetRelationOk() (*string, bool) {
 	if o == nil || o.Relation == nil {
 		return nil, false
 	}
@@ -90,7 +83,7 @@ func (o *ObjectRelation) GetRelationOk() (*string, bool) {
 }
 
 // HasRelation returns a boolean if a field has been set.
-func (o *ObjectRelation) HasRelation() bool {
+func (o *RelationReference) HasRelation() bool {
 	if o != nil && o.Relation != nil {
 		return true
 	}
@@ -99,14 +92,14 @@ func (o *ObjectRelation) HasRelation() bool {
 }
 
 // SetRelation gets a reference to the given string and assigns it to the Relation field.
-func (o *ObjectRelation) SetRelation(v string) {
+func (o *RelationReference) SetRelation(v string) {
 	o.Relation = &v
 }
 
-func (o ObjectRelation) MarshalJSON() ([]byte, error) {
+func (o RelationReference) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Object != nil {
-		toSerialize["object"] = o.Object
+	if true {
+		toSerialize["type"] = o.Type
 	}
 	if o.Relation != nil {
 		toSerialize["relation"] = o.Relation
@@ -114,38 +107,38 @@ func (o ObjectRelation) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableObjectRelation struct {
-	value *ObjectRelation
+type NullableRelationReference struct {
+	value *RelationReference
 	isSet bool
 }
 
-func (v NullableObjectRelation) Get() *ObjectRelation {
+func (v NullableRelationReference) Get() *RelationReference {
 	return v.value
 }
 
-func (v *NullableObjectRelation) Set(val *ObjectRelation) {
+func (v *NullableRelationReference) Set(val *RelationReference) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableObjectRelation) IsSet() bool {
+func (v NullableRelationReference) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableObjectRelation) Unset() {
+func (v *NullableRelationReference) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableObjectRelation(val *ObjectRelation) *NullableObjectRelation {
-	return &NullableObjectRelation{value: val, isSet: true}
+func NewNullableRelationReference(val *RelationReference) *NullableRelationReference {
+	return &NullableRelationReference{value: val, isSet: true}
 }
 
-func (v NullableObjectRelation) MarshalJSON() ([]byte, error) {
+func (v NullableRelationReference) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableObjectRelation) UnmarshalJSON(src []byte) error {
+func (v *NullableRelationReference) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

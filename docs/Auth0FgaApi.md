@@ -6,6 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**Check**](Auth0FgaApi.md#Check) | **Post** /stores/{store_id}/check | Check whether a user is authorized to access an object
 [**Expand**](Auth0FgaApi.md#Expand) | **Post** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
+[**ListObjects**](Auth0FgaApi.md#ListObjects) | **Post** /stores/{store_id}/list-objects | [EXPERIMENTAL] Returns a list of all of the object IDs of the provided type that the given user has a specific relation with
 [**Read**](Auth0FgaApi.md#Read) | **Post** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 [**ReadAssertions**](Auth0FgaApi.md#ReadAssertions) | **Get** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
 [**ReadAuthorizationModel**](Auth0FgaApi.md#ReadAuthorizationModel) | **Get** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
@@ -186,6 +187,98 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**ExpandResponse**](ExpandResponse.md)
+
+### Authorization
+
+[ClientCredentials](../README.md#ClientCredentials)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ListObjects
+
+> ListObjectsResponse ListObjects(ctx).Body(body).Execute()
+
+[EXPERIMENTAL] Returns a list of all of the object IDs of the provided type that the given user has a specific relation with
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    auth0fga "github.com/auth0-lab/fga-go-sdk"
+)
+
+func main() {
+    
+    body := *openapiclient.NewListObjectsRequest() // ListObjectsRequest | 
+
+    // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
+    configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
+        Environment:  os.Getenv("AUTH0_FGA_ENVIRONMENT"), // can be: "us"/"staging"/"playground"
+        StoreId:      os.Getenv("AUTH0_FGA_STORE_ID"),
+        ClientId:     os.Getenv("AUTH0_FGA_CLIENT_ID"), // Required for all environments except playground
+        ClientSecret: os.Getenv("AUTH0_FGA_CLIENT_SECRET"), // Required for all environments except playground
+    })
+
+    apiClient := auth0fga.NewAPIClient(configuration)
+
+    resp, r, err := apiClient.Auth0FgaApi.ListObjects(context.Background()).Body(body).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.ListObjects``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+        switch v := err.(type) {
+        case FgaApiAuthenticationError:
+            // Handle authentication error
+        case FgaApiValidationError:
+            // Handle parameter validation error
+        case FgaApiNotFoundError:
+            // Handle not found error
+        case FgaApiInternalError:
+            // Handle API internal error
+        case FgaApiRateLimitError:
+            // Exponential backoff in handling rate limit error
+        default:
+            // Handle unknown/undefined error
+        }
+    }
+    // response from `ListObjects`: ListObjectsResponse
+    fmt.Fprintf(os.Stdout, "Response from `Auth0FgaApi.ListObjects`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiListObjectsRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**body** | [**ListObjectsRequest**](ListObjectsRequest.md) |  | 
+
+### Return type
+
+[**ListObjectsResponse**](ListObjectsResponse.md)
 
 ### Authorization
 
@@ -853,7 +946,7 @@ Name | Type | Description  | Notes
 
 ## WriteAuthorizationModel
 
-> WriteAuthorizationModelResponse WriteAuthorizationModel(ctx).TypeDefinitions(typeDefinitions).Execute()
+> WriteAuthorizationModelResponse WriteAuthorizationModel(ctx).Body(body).Execute()
 
 Create a new authorization model
 
@@ -873,7 +966,7 @@ import (
 
 func main() {
     
-    typeDefinitions := *openapiclient.NewTypeDefinitions() // TypeDefinitions | 
+    body := *openapiclient.NewWriteAuthorizationModelRequest() // WriteAuthorizationModelRequest | 
 
     // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
     configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
@@ -885,7 +978,7 @@ func main() {
 
     apiClient := auth0fga.NewAPIClient(configuration)
 
-    resp, r, err := apiClient.Auth0FgaApi.WriteAuthorizationModel(context.Background()).TypeDefinitions(typeDefinitions).Execute()
+    resp, r, err := apiClient.Auth0FgaApi.WriteAuthorizationModel(context.Background()).Body(body).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `Auth0FgaApi.WriteAuthorizationModel``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -923,7 +1016,7 @@ Other parameters are passed through a pointer to a apiWriteAuthorizationModelReq
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-**typeDefinitions** | [**TypeDefinitions**](TypeDefinitions.md) |  | 
+**body** | [**WriteAuthorizationModelRequest**](WriteAuthorizationModelRequest.md) |  | 
 
 ### Return type
 

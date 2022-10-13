@@ -27,6 +27,8 @@
 
 * `BEARER_TOKEN_MISSING` (value: `"bearer_token_missing"`)
 
+* `MISSING_USER_IN_BEARER_TOKEN` (value: `"missing_user_in_bearer_token"`)
+
 * `UNAUTHENTICATED` (value: `"unauthenticated"`)
 
 * `INSUFFICIENT_PERMISSIONS` (value: `"insufficient_permissions"`)
