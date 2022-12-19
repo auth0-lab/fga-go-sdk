@@ -6,7 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**Check**](Auth0FgaApi.md#Check) | **Post** /stores/{store_id}/check | Check whether a user is authorized to access an object
 [**Expand**](Auth0FgaApi.md#Expand) | **Post** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
-[**ListObjects**](Auth0FgaApi.md#ListObjects) | **Post** /stores/{store_id}/list-objects | [EXPERIMENTAL] Returns a list of all of the object IDs of the provided type that the given user has a specific relation with
+[**ListObjects**](Auth0FgaApi.md#ListObjects) | **Post** /stores/{store_id}/list-objects | [EXPERIMENTAL] Get all objects of the given type that the user has a relation with
 [**Read**](Auth0FgaApi.md#Read) | **Post** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 [**ReadAssertions**](Auth0FgaApi.md#ReadAssertions) | **Get** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
 [**ReadAuthorizationModel**](Auth0FgaApi.md#ReadAuthorizationModel) | **Get** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
@@ -40,7 +40,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewCheckRequest() // CheckRequest | 
+    body := *openapiclient.NewCheckRequest(*openapiclient.NewTupleKey()) // CheckRequest | 
 
     // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
     configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
@@ -132,7 +132,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewExpandRequest() // ExpandRequest | 
+    body := *openapiclient.NewExpandRequest(*openapiclient.NewTupleKey()) // ExpandRequest | 
 
     // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
     configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
@@ -206,7 +206,7 @@ Name | Type | Description  | Notes
 
 > ListObjectsResponse ListObjects(ctx).Body(body).Execute()
 
-[EXPERIMENTAL] Returns a list of all of the object IDs of the provided type that the given user has a specific relation with
+[EXPERIMENTAL] Get all objects of the given type that the user has a relation with
 
 
 
@@ -224,7 +224,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewListObjectsRequest() // ListObjectsRequest | 
+    body := *openapiclient.NewListObjectsRequest("document", "reader", "user:anne") // ListObjectsRequest | 
 
     // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
     configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
@@ -875,7 +875,7 @@ import (
 func main() {
     
     authorizationModelId := "authorizationModelId_example" // string | 
-    body := *openapiclient.NewWriteAssertionsRequest([]openapiclient.Assertion{*openapiclient.NewAssertion(false)}) // WriteAssertionsRequest | 
+    body := *openapiclient.NewWriteAssertionsRequest([]openapiclient.Assertion{*openapiclient.NewAssertion(*openapiclient.NewTupleKey(), false)}) // WriteAssertionsRequest | 
 
     // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
     configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{
@@ -966,7 +966,7 @@ import (
 
 func main() {
     
-    body := *openapiclient.NewWriteAuthorizationModelRequest() // WriteAuthorizationModelRequest | 
+    body := *openapiclient.NewWriteAuthorizationModelRequest([]openapiclient.TypeDefinition{*openapiclient.NewTypeDefinition("document")}) // WriteAuthorizationModelRequest | 
 
     // See https://github.com/auth0-lab/fga-go-sdk#getting-your-store-id-client-id-and-client-secret
     configuration, err := auth0fga.NewConfiguration(auth0fga.Configuration{

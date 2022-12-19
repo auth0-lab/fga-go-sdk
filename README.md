@@ -140,12 +140,15 @@ In the playground environment, you do not need to provide a client id and client
 > Learn more about [the Auth0 Fine Grained Authorization (FGA) configuration language](https://docs.fga.dev/modeling/configuration-language).
 
 ```golang
-body  := auth0fga.WriteAuthorizationModelRequest{TypeDefinitions: &[]auth0fga.TypeDefinition{
+body  := auth0fga.WriteAuthorizationModelRequest{TypeDefinitions: []auth0fga.TypeDefinition{
 	{
-		Type: "repo",
+		Type: "user",
+	},
+	{
+		Type: "document",
 		Relations: &map[string]auth0fga.Userset{
 			"writer": {This: &map[string]interface{}{}},
-			"reader": {Union: &auth0fga.Usersets{
+			"viewer": {Union: &auth0fga.Usersets{
 				Child: &[]auth0fga.Userset{
 					{This: &map[string]interface{}{}},
 					{ComputedUserset: &auth0fga.ObjectRelation{
@@ -170,7 +173,7 @@ fmt.Printf("%s", data.AuthorizationModelId) // 1uHxCSuTP0VKPYSnkq1pbb1jeZw
 // Assuming `1uHxCSuTP0VKPYSnkq1pbb1jeZw` is an id of a single model
 data, response, err := apiClient.Auth0FgaApi.ReadAuthorizationModel(context.Background(), "1uHxCSuTP0VKPYSnkq1pbb1jeZw").Execute()
 
-// data = {"authorization_model":{"id":"1uHxCSuTP0VKPYSnkq1pbb1jeZw","type_definitions":[{"type":"repo","relations":{"writer":{"this":{}},"reader":{ ... }}}]}} // JSON
+// data = {"authorization_model":{"id":"1uHxCSuTP0VKPYSnkq1pbb1jeZw","type_definitions":[{"type":"document","relations":{"writer":{"this":{}},"viewer":{ ... }}},{"type":"user"}]}} // JSON
 
 fmt.Printf("%s", data.AuthorizationModel.Id) // 1uHxCSuTP0VKPYSnkq1pbb1jeZw
 ```
@@ -195,11 +198,12 @@ fmt.Printf("%s", (*data.AuthorizationModelIds)[0]) // 1uHxCSuTP0VKPYSnkq1pbb1jeZ
 
 ```golang
 body := auth0fga.CheckRequest{
-	TupleKey: &auth0fga.TupleKey{
+	TupleKey: auth0fga.TupleKey{
 		User: auth0fga.PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-		Relation: auth0fga.PtrString("admin"),
-		Object: auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+		Relation: auth0fga.PtrString("viewer"),
+		Object: auth0fga.PtrString("document:roadmap"),
 	},
+	AuthorizationModelId: auth0fga.PtrString("1uHxCSuTP0VKPYSnkq1pbb1jeZw"),
 }
 data, response, err := apiClient.Auth0FgaApi.Check(context.Background()).Body(body).Execute()
 
@@ -219,11 +223,12 @@ body := auth0fga.WriteRequest{
 		TupleKeys: []auth0fga.TupleKey{
 			{
 				User: auth0fga.PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-				Relation: auth0fga.PtrString("admin"),
-				Object: auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+				Relation: auth0fga.PtrString("viewer"),
+				Object: auth0fga.PtrString("document:roadmap"),
 			},
 		},
 	},
+	AuthorizationModelId: auth0fga.PtrString("1uHxCSuTP0VKPYSnkq1pbb1jeZw"),
 }
 _, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(body).Execute()
 
@@ -239,11 +244,12 @@ body := auth0fga.WriteRequest{
 		TupleKeys: []auth0fga.TupleKey{
 			{
 				User: auth0fga.PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-				Relation: auth0fga.PtrString("admin"),
-				Object: auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+				Relation: auth0fga.PtrString("viewer"),
+				Object: auth0fga.PtrString("document:roadmap"),
 			},
 		},
 	},
+	AuthorizationModelId: auth0fga.PtrString("1uHxCSuTP0VKPYSnkq1pbb1jeZw"),
 }
 _, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(body).Execute()
 
@@ -255,14 +261,15 @@ _, response, err := apiClient.Auth0FgaApi.Write(context.Background()).Body(body)
 
 ```golang
 body := auth0fga.ExpandRequest{
-	TupleKey: &auth0fga.TupleKey{
-		Relation: auth0fga.PtrString("admin"),
-		Object: auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+	TupleKey: auth0fga.TupleKey{
+		Relation: auth0fga.PtrString("viewer"),
+		Object: auth0fga.PtrString("document:roadmap"),
 	},
+	AuthorizationModelId: auth0fga.PtrString("1uHxCSuTP0VKPYSnkq1pbb1jeZw"),
 }
 data, response, err := apiClient.Auth0FgaApi.Expand(context.Background()).Body(body).Execute()
 
-// data = {"tree":{"root":{"name":"workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6#admin","leaf":{"users":{"users":["user:81684243-9356-4421-8fbf-a4f8d36aa31b","user:f52a4f7a-054d-47ff-bb6e-3ac81269988f"]}}}}} // JSON
+// data = {"tree":{"root":{"name":"document:roadmap#viewer","leaf":{"users":{"users":["user:81684243-9356-4421-8fbf-a4f8d36aa31b","user:f52a4f7a-054d-47ff-bb6e-3ac81269988f"]}}}}} // JSON
 ```
 
 #### Read Changes
@@ -270,38 +277,41 @@ data, response, err := apiClient.Auth0FgaApi.Expand(context.Background()).Body(b
 [API Documentation](https://docs.fga.dev/api/service#/Relationship%20Tuples/Read)
 
 ```golang
-// Find if a relationship tuple stating that a certain user is an admin on a certain workspace
+// Find if a relationship tuple stating that a certain user is a viewer of a certain document
 body := auth0fga.ReadRequest{
     TupleKey: &auth0fga.TupleKey{
         User:     auth0fga.PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-        Relation: auth0fga.PtrString("admin"),
-        Object:   auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+        Relation: auth0fga.PtrString("viewer"),
+        Object:   auth0fga.PtrString("document:roadmap"),
     },
 }
 
-// Find all relationship tuples where a certain user has a relationship as any relation to a certain workspace
+// Find all relationship tuples where a certain user has a relationship as any relation to a certain document
 body := auth0fga.ReadRequest{
     TupleKey: &auth0fga.TupleKey{
         User:     auth0fga.PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-        Object:   auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+        Object:   auth0fga.PtrString("document:roadmap"),
     },
 }
 
-// Find all relationship tuples where a certain user is an admin on any workspace
+// Find all relationship tuples where a certain user is a viewer of any document
 body := auth0fga.ReadRequest{
     TupleKey: &auth0fga.TupleKey{
         User:     auth0fga.PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-        Relation: auth0fga.PtrString("admin"),
-        Object:   auth0fga.PtrString("workspace:"),
+        Relation: auth0fga.PtrString("viewer"),
+        Object:   auth0fga.PtrString("document:"),
     },
 }
 
-// Find all relationship tuples where any user has a relationship as any relation with a particular workspace
+// Find all relationship tuples where any user has a relationship as any relation with a particular document
 body := auth0fga.ReadRequest{
     TupleKey: &auth0fga.TupleKey{
-        Object:   auth0fga.PtrString("workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"),
+        Object:   auth0fga.PtrString("document:roadmap"),
     },
 }
+
+// Read all stored relationship tuples
+body := auth0fga.ReadRequest{}
 
 data, response, err := apiClient.Auth0FgaApi.Read(context.Background()).Body(body).Execute()
 
@@ -315,44 +325,42 @@ data, response, err := apiClient.Auth0FgaApi.Read(context.Background()).Body(bod
 
 ```golang
 data, response, err := apiClient.Auth0FgaApi.ReadChanges(context.Background()).
-    Type_("workspace").
+    Type_("document").
     PageSize(25).
     ContinuationToken("eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==").
     Execute()
 
 // response.continuation_token = ...
 // response.changes = [
-//   { tuple_key: { user, relation, object }, operation: "write", timestamp: ... },
-//   { tuple_key: { user, relation, object }, operation: "delete", timestamp: ... }
+//   { tuple_key: { user, relation, object }, operation: "writer", timestamp: ... },
+//   { tuple_key: { user, relation, object }, operation: "viewer", timestamp: ... }
 // ]
 ```
 
 #### List Objects
 
+> Requires a client initialized with a storeId
+
 [API Documentation](https://docs.fga.dev/api/service#/Relationship%20Queries/ListObjects)
 
 ```golang
 body := auth0fga.ListObjectsRequest{
-    AuthorizationModelId: PtrString("01GAHCE4YVKPQEKZQHT2R89MQV"),
-    User:                 PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-    Relation:             PtrString("can_read"),
-    Type:                 PtrString("document"),
-    ContextualTuples: &ContextualTupleKeys{
+	AuthorizationModelId: auth0fga.PtrString("1uHxCSuTP0VKPYSnkq1pbb1jeZw"),
+    User:                 "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+    Relation:             "viewer",
+    Type:                 "document",
+	ContextualTuples: &ContextualTupleKeys{
         TupleKeys: []TupleKey{{
             User:     PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-            Relation: PtrString("editor"),
-            Object:   PtrString("folder:product"),
-        }, {
-            User:     PtrString("folder:product"),
-            Relation: PtrString("parent"),
-            Object:   PtrString("document:roadmap"),
+            Relation: PtrString("writer"),
+            Object:   PtrString("document:budget"),
         }},
     },
 }
 
 data, response, err := apiClient.Auth0FgaApi.ListObjects(context.Background()).Body(body).Execute()
 
-// response.object_ids = ["roadmap"]
+// response.objects = ["document:roadmap"]
 ```
 
 
@@ -362,7 +370,7 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *Auth0FgaApi* | [**Check**](docs/Auth0FgaApi.md#check) | **Post** /stores/{store_id}/check | Check whether a user is authorized to access an object
 *Auth0FgaApi* | [**Expand**](docs/Auth0FgaApi.md#expand) | **Post** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
-*Auth0FgaApi* | [**ListObjects**](docs/Auth0FgaApi.md#listobjects) | **Post** /stores/{store_id}/list-objects | [EXPERIMENTAL] Returns a list of all of the object IDs of the provided type that the given user has a specific relation with
+*Auth0FgaApi* | [**ListObjects**](docs/Auth0FgaApi.md#listobjects) | **Post** /stores/{store_id}/list-objects | [EXPERIMENTAL] Get all objects of the given type that the user has a relation with
 *Auth0FgaApi* | [**Read**](docs/Auth0FgaApi.md#read) | **Post** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 *Auth0FgaApi* | [**ReadAssertions**](docs/Auth0FgaApi.md#readassertions) | **Get** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
 *Auth0FgaApi* | [**ReadAuthorizationModel**](docs/Auth0FgaApi.md#readauthorizationmodel) | **Get** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
@@ -384,18 +392,15 @@ Class | Method | HTTP request | Description
  - [CheckResponse](docs/CheckResponse.md)
  - [Computed](docs/Computed.md)
  - [ContextualTupleKeys](docs/ContextualTupleKeys.md)
- - [CreateStoreResponse](docs/CreateStoreResponse.md)
  - [Difference](docs/Difference.md)
  - [ErrorCode](docs/ErrorCode.md)
  - [ExpandRequest](docs/ExpandRequest.md)
  - [ExpandResponse](docs/ExpandResponse.md)
- - [GetStoreResponse](docs/GetStoreResponse.md)
  - [InternalErrorCode](docs/InternalErrorCode.md)
  - [InternalErrorMessageResponse](docs/InternalErrorMessageResponse.md)
  - [Leaf](docs/Leaf.md)
  - [ListObjectsRequest](docs/ListObjectsRequest.md)
  - [ListObjectsResponse](docs/ListObjectsResponse.md)
- - [ListStoresResponse](docs/ListStoresResponse.md)
  - [Metadata](docs/Metadata.md)
  - [Node](docs/Node.md)
  - [Nodes](docs/Nodes.md)
@@ -413,7 +418,6 @@ Class | Method | HTTP request | Description
  - [ResourceExhaustedErrorCode](docs/ResourceExhaustedErrorCode.md)
  - [ResourceExhaustedErrorMessageResponse](docs/ResourceExhaustedErrorMessageResponse.md)
  - [Status](docs/Status.md)
- - [Store](docs/Store.md)
  - [Tuple](docs/Tuple.md)
  - [TupleChange](docs/TupleChange.md)
  - [TupleKey](docs/TupleKey.md)

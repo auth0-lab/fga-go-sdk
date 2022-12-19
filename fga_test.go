@@ -303,7 +303,7 @@ func TestAuth0FgaApi(t *testing.T) {
 			RequestPath:    "authorization-models",
 		}
 		requestBody := WriteAuthorizationModelRequest{
-			TypeDefinitions: &[]TypeDefinition{{
+			TypeDefinitions: []TypeDefinition{{
 				Type: "github-repo",
 				Relations: &map[string]Userset{
 					"repo_writer": {
@@ -407,7 +407,7 @@ func TestAuth0FgaApi(t *testing.T) {
 			RequestPath:    "check",
 		}
 		requestBody := CheckRequest{
-			TupleKey: &TupleKey{
+			TupleKey: TupleKey{
 				User:     PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
 				Relation: PtrString("viewer"),
 				Object:   PtrString("document:roadmap"),
@@ -548,7 +548,7 @@ func TestAuth0FgaApi(t *testing.T) {
 		}
 
 		requestBody := ExpandRequest{
-			TupleKey: &TupleKey{
+			TupleKey: TupleKey{
 				Relation: PtrString("viewer"),
 				Object:   PtrString("document:roadmap"),
 			},
@@ -688,7 +688,7 @@ func TestAuth0FgaApi(t *testing.T) {
 	t.Run("ListObjects", func(t *testing.T) {
 		test := TestDefinition{
 			Name:           "ListObjects",
-			JsonResponse:   `{"object_ids":["roadmap"]}`,
+			JsonResponse:   `{"objects":["document:roadmap"]}`,
 			ResponseStatus: 200,
 			Method:         "POST",
 			RequestPath:    "list-objects",
@@ -696,9 +696,9 @@ func TestAuth0FgaApi(t *testing.T) {
 
 		requestBody := ListObjectsRequest{
 			AuthorizationModelId: PtrString("01GAHCE4YVKPQEKZQHT2R89MQV"),
-			User:                 PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-			Relation:             PtrString("can_read"),
-			Type:                 PtrString("document"),
+			User:                 "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+			Relation:             "can_read",
+			Type:                 "document",
 			ContextualTuples: &ContextualTupleKeys{
 				TupleKeys: []TupleKey{{
 					User:     PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
@@ -744,7 +744,7 @@ func TestAuth0FgaApi(t *testing.T) {
 			t.Fatalf("%v", err)
 		}
 
-		if len(*got.ObjectIds) != len(*expectedResponse.ObjectIds) {
+		if len(*got.Objects) != len(*expectedResponse.Objects) || (*got.Objects)[0] != (*expectedResponse.Objects)[0] {
 			t.Fatalf("Auth0Fga%v().Execute() = %v, want %v", test.Name, string(responseJson), test.JsonResponse)
 		}
 	})
@@ -758,7 +758,7 @@ func TestAuth0FgaApi(t *testing.T) {
 			RequestPath:    "check",
 		}
 		requestBody := CheckRequest{
-			TupleKey: &TupleKey{
+			TupleKey: TupleKey{
 				User:     PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
 				Relation: PtrString("viewer"),
 				Object:   PtrString("document:roadmap"),
@@ -821,7 +821,7 @@ func TestAuth0FgaApi(t *testing.T) {
 			RequestPath:    "check",
 		}
 		requestBody := CheckRequest{
-			TupleKey: &TupleKey{
+			TupleKey: TupleKey{
 				User:     PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
 				Relation: PtrString("viewer"),
 				Object:   PtrString("document:roadmap"),
@@ -877,7 +877,7 @@ func TestAuth0FgaApi(t *testing.T) {
 			RequestPath:    "check",
 		}
 		requestBody := CheckRequest{
-			TupleKey: &TupleKey{
+			TupleKey: TupleKey{
 				User:     PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
 				Relation: PtrString("viewer"),
 				Object:   PtrString("document:roadmap"),
@@ -940,7 +940,7 @@ func TestAuth0FgaApi(t *testing.T) {
 			RequestPath:    "check",
 		}
 		requestBody := CheckRequest{
-			TupleKey: &TupleKey{
+			TupleKey: TupleKey{
 				User:     PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
 				Relation: PtrString("viewer"),
 				Object:   PtrString("document:roadmap"),
@@ -1011,7 +1011,7 @@ func TestAuth0FgaApi(t *testing.T) {
 			RequestPath:    "check",
 		}
 		requestBody := CheckRequest{
-			TupleKey: &TupleKey{
+			TupleKey: TupleKey{
 				User:     PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
 				Relation: PtrString("viewer"),
 				Object:   PtrString("document:roadmap"),
@@ -1073,7 +1073,7 @@ func TestAuth0FgaApi(t *testing.T) {
 			RequestPath:    "check",
 		}
 		requestBody := CheckRequest{
-			TupleKey: &TupleKey{
+			TupleKey: TupleKey{
 				User:     PtrString("user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
 				Relation: PtrString("viewer"),
 				Object:   PtrString("document:roadmap"),

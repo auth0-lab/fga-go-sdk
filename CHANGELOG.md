@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.6.0
+
+### [0.6.0](https://github.com/auth0-lab/fga-go-sdk/compare/v0.5.0...v0.6.0) (2022-12-16)
+
+Changes:
+- [BREAKING] feat(list-objects)!: response has been changed to include the object type
+    e.g. response that was `{"object_ids":["roadmap"]}`, will now be `{"objects":["document:roadmap"]}`
+
+Fixes:
+- [BREAKING] fix(models)!: update interfaces that had incorrectly optional fields to make them required
+
+Chore:
+- chore(deps): update dependencies
+
 ## v0.5.0
 
 ### [0.5.0](https://github.com/auth0-lab/fga-go-sdk/compare/v0.4.0...v0.5.0) (2022-10-13)
