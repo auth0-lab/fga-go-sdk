@@ -92,7 +92,7 @@ func DefaultRetryParams() *RetryParams {
 
 func GetSdkUserAgent() string {
 	userAgent := strings.Replace("auth0-fga-sdk {sdkId}/{packageVersion}", "{sdkId}", "go", -1)
-	userAgent = strings.Replace(userAgent, "{packageVersion}", "0.6.0", -1)
+	userAgent = strings.Replace(userAgent, "{packageVersion}", "0.6.1", -1)
 
 	return userAgent
 }

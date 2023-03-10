@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.6.1
+
+### [0.6.1](https://github.com/auth0-lab/fga-go-sdk/compare/v0.6.0...v0.6.1) (2023-03-10)
+
+- fix: retry on 5xx errors
+- chore(deps): drop `golang.org/x/net` dependency
+
 ## v0.6.0
 
 ### [0.6.0](https://github.com/auth0-lab/fga-go-sdk/compare/v0.5.0...v0.6.0) (2022-12-16)
