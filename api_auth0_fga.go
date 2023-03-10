@@ -95,7 +95,7 @@ type Auth0FgaApi interface {
 	  }
 	}
 	```
-	Auth0 FGA's response will be a userset tree of the users and usersets that have read access to the document.
+	Auth0 FGA's response will be a userset tree of the users and computed usersets that have read access to the document.
 	```json
 	{
 	  "tree":{
@@ -353,10 +353,12 @@ type Auth0FgaApi interface {
 	ReadAuthorizationModelExecute(r ApiReadAuthorizationModelRequest) (ReadAuthorizationModelResponse, *_nethttp.Response, error)
 
 	/*
-		 * ReadAuthorizationModels Return all the authorization model IDs for a particular store
+		 * ReadAuthorizationModels Return all the authorization models for a particular store
 		 * The ReadAuthorizationModels API will return all the authorization models for a certain store.
 	Auth0 FGA's response will contain an array of all authorization models, sorted in descending order of creation.
 
+	## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
+	- Each response can contain up to **50** authorization model IDs.
 	## Example
 	Assume that a store's authorization model has been configured twice. To get all the authorization models that have been created in this store, call GET authorization-models. The API will return a response that looks like:
 	```json
@@ -405,7 +407,8 @@ type Auth0FgaApi interface {
 		 * ReadChanges Return a list of all the tuple changes
 		 * The ReadChanges API will return a paginated list of tuple changes (additions and deletions) that occurred in a given store, sorted by ascending time. The response will include a continuation token that is used to get the next set of changes. If there are no changes after the provided continuation token, the same token will be returned in order for it to be used when new changes are recorded. If the store never had any tuples added or removed, this token will be empty.
 	You can use the `type` parameter to only get the list of tuple changes that affect objects of that type.
-
+	## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
+	- Each store has a limit of **5** requests per second (RPS).
 		 * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 		 * @return ApiReadChangesRequest
 	*/
@@ -419,9 +422,12 @@ type Auth0FgaApi interface {
 
 	/*
 		 * Write Add or delete tuples from the store
-		 * The Write API will update the tuples for a certain store. Tuples and type definitions allow OpenFGA to determine whether a relationship exists between an object and an user.
-	In the body, `writes` adds new tuples while `deletes` removes existing tuples. The API is not idempotent: if, later on, you try to add the same tuple, or if you try to delete a non-existing tuple, it will throw an error.
+		 * The Write API will update the tuples for a certain store. Tuples and type definitions allow Auth0 FGA to determine whether a relationship exists between an object and an user.
+	In the body, `writes` adds new tuples while `deletes` removes existing tuples.
 	An `authorization_model_id` may be specified in the body. If it is, it will be used to assert that each written tuple (not deleted) is valid for the model specified. If it is not specified, the latest authorization model ID will be used.
+	## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
+	- Each write API call allows at most **10** tuples.
+	- Each store has a limit of **50000** tuples.
 	## Example
 	### Adding relationships
 	To add `user:anne` as a `writer` for `document:2021-budget`, call write API with the following
@@ -439,7 +445,7 @@ type Auth0FgaApi interface {
 	}
 	```
 	### Removing relationships
-	To remove `user:bob` as a `reader` for `document:2021-budget`, call write API with the following
+	To remove `user:bob` as a `reader` for `document:2021-budget`, use the Write API with the following request body
 	```json
 	{
 	  "deletes": {
@@ -916,7 +922,7 @@ To expand all users that have the `reader` relationship with object `document:20
 	}
 
 ```
-Auth0 FGA's response will be a userset tree of the users and usersets that have read access to the document.
+Auth0 FGA's response will be a userset tree of the users and computed usersets that have read access to the document.
 ```json
 
 	{
@@ -2534,11 +2540,13 @@ func (r ApiReadAuthorizationModelsRequest) Execute() (ReadAuthorizationModelsRes
 }
 
 /*
-  - ReadAuthorizationModels Return all the authorization model IDs for a particular store
+  - ReadAuthorizationModels Return all the authorization models for a particular store
   - The ReadAuthorizationModels API will return all the authorization models for a certain store.
 
 Auth0 FGA's response will contain an array of all authorization models, sorted in descending order of creation.
 
+## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
+- Each response can contain up to **50** authorization model IDs.
 ## Example
 Assume that a store's authorization model has been configured twice. To get all the authorization models that have been created in this store, call GET authorization-models. The API will return a response that looks like:
 ```json
@@ -2873,7 +2881,8 @@ func (r ApiReadChangesRequest) Execute() (ReadChangesResponse, *_nethttp.Respons
   - The ReadChanges API will return a paginated list of tuple changes (additions and deletions) that occurred in a given store, sorted by ascending time. The response will include a continuation token that is used to get the next set of changes. If there are no changes after the provided continuation token, the same token will be returned in order for it to be used when new changes are recorded. If the store never had any tuples added or removed, this token will be empty.
 
 You can use the `type` parameter to only get the list of tuple changes that affect objects of that type.
-
+## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
+- Each store has a limit of **5** requests per second (RPS).
   - @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
   - @return ApiReadChangesRequest
 */
@@ -3161,10 +3170,13 @@ func (r ApiWriteRequest) Execute() (map[string]interface{}, *_nethttp.Response, 
 
 /*
   - Write Add or delete tuples from the store
-  - The Write API will update the tuples for a certain store. Tuples and type definitions allow OpenFGA to determine whether a relationship exists between an object and an user.
+  - The Write API will update the tuples for a certain store. Tuples and type definitions allow Auth0 FGA to determine whether a relationship exists between an object and an user.
 
-In the body, `writes` adds new tuples while `deletes` removes existing tuples. The API is not idempotent: if, later on, you try to add the same tuple, or if you try to delete a non-existing tuple, it will throw an error.
+In the body, `writes` adds new tuples while `deletes` removes existing tuples.
 An `authorization_model_id` may be specified in the body. If it is, it will be used to assert that each written tuple (not deleted) is valid for the model specified. If it is not specified, the latest authorization model ID will be used.
+## [Limits](https://docs.fga.dev/intro/dashboard#limitations)
+- Each write API call allows at most **10** tuples.
+- Each store has a limit of **50000** tuples.
 ## Example
 ### Adding relationships
 To add `user:anne` as a `writer` for `document:2021-budget`, call write API with the following
@@ -3184,7 +3196,7 @@ To add `user:anne` as a `writer` for `document:2021-budget`, call write API with
 
 ```
 ### Removing relationships
-To remove `user:bob` as a `reader` for `document:2021-budget`, call write API with the following
+To remove `user:bob` as a `reader` for `document:2021-budget`, use the Write API with the following request body
 ```json
 
 	{

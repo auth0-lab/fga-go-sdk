@@ -39,7 +39,7 @@ Warning: This SDK comes with no SLAs and is not production-ready!
 
 ## About
 
-[Auth0 Fine Grained Authorization (FGA)](https://fga.dev) is an open source Fine-Grained Authorization solution inspired by [Google's Zanzibar paper](https://research.google/pubs/pub48190/). It was created by the FGA team at [Auth0](https://auth0.com) based on [Auth0 Fine-Grained Authorization (FGA)](https://fga.dev), available under [a permissive license (Apache-2)](https://github.com/auth0-lab/rfcs/blob/main/LICENSE) and welcomes community contributions.
+[Auth0 Fine Grained Authorization (FGA)](https://fga.dev) is Auth0's Fine-Grained Authorization at scale SaaS based on Google's Zanzibar.
 
 Auth0 Fine Grained Authorization (FGA) is designed to make it easy for application builders to model their permission layer, and to add and integrate fine-grained authorization into their applications. Auth0 Fine Grained Authorization (FGA)’s design is optimized for reliability and low latency at a high scale.
 
@@ -374,7 +374,7 @@ Class | Method | HTTP request | Description
 *Auth0FgaApi* | [**Read**](docs/Auth0FgaApi.md#read) | **Post** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 *Auth0FgaApi* | [**ReadAssertions**](docs/Auth0FgaApi.md#readassertions) | **Get** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
 *Auth0FgaApi* | [**ReadAuthorizationModel**](docs/Auth0FgaApi.md#readauthorizationmodel) | **Get** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
-*Auth0FgaApi* | [**ReadAuthorizationModels**](docs/Auth0FgaApi.md#readauthorizationmodels) | **Get** /stores/{store_id}/authorization-models | Return all the authorization model IDs for a particular store
+*Auth0FgaApi* | [**ReadAuthorizationModels**](docs/Auth0FgaApi.md#readauthorizationmodels) | **Get** /stores/{store_id}/authorization-models | Return all the authorization models for a particular store
 *Auth0FgaApi* | [**ReadChanges**](docs/Auth0FgaApi.md#readchanges) | **Get** /stores/{store_id}/changes | Return a list of all the tuple changes
 *Auth0FgaApi* | [**Write**](docs/Auth0FgaApi.md#write) | **Post** /stores/{store_id}/write | Add or delete tuples from the store
 *Auth0FgaApi* | [**WriteAssertions**](docs/Auth0FgaApi.md#writeassertions) | **Put** /stores/{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
