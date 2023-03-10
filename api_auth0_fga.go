@@ -788,7 +788,7 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -819,6 +819,11 @@ func (a *Auth0FgaApiService) CheckExecute(r ApiCheckRequest) (CheckResponse, *_n
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
@@ -1124,7 +1129,7 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -1155,6 +1160,11 @@ func (a *Auth0FgaApiService) ExpandExecute(r ApiExpandRequest) (ExpandResponse, 
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
@@ -1434,7 +1444,7 @@ func (a *Auth0FgaApiService) ListObjectsExecute(r ApiListObjectsRequest) (ListOb
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -1465,6 +1475,11 @@ func (a *Auth0FgaApiService) ListObjectsExecute(r ApiListObjectsRequest) (ListOb
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
@@ -1823,7 +1838,7 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -1854,6 +1869,11 @@ func (a *Auth0FgaApiService) ReadExecute(r ApiReadRequest) (ReadResponse, *_neth
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
@@ -2100,7 +2120,7 @@ func (a *Auth0FgaApiService) ReadAssertionsExecute(r ApiReadAssertionsRequest) (
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -2131,6 +2151,11 @@ func (a *Auth0FgaApiService) ReadAssertionsExecute(r ApiReadAssertionsRequest) (
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
@@ -2420,7 +2445,7 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelExecute(r ApiReadAuthorizatio
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -2451,6 +2476,11 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelExecute(r ApiReadAuthorizatio
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
@@ -2752,7 +2782,7 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -2783,6 +2813,11 @@ func (a *Auth0FgaApiService) ReadAuthorizationModelsExecute(r ApiReadAuthorizati
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
@@ -3054,7 +3089,7 @@ func (a *Auth0FgaApiService) ReadChangesExecute(r ApiReadChangesRequest) (ReadCh
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -3085,6 +3120,11 @@ func (a *Auth0FgaApiService) ReadChangesExecute(r ApiReadChangesRequest) (ReadCh
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
@@ -3380,7 +3420,7 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -3411,6 +3451,11 @@ func (a *Auth0FgaApiService) WriteExecute(r ApiWriteRequest) (map[string]interfa
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
@@ -3666,7 +3711,7 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -3697,6 +3742,11 @@ func (a *Auth0FgaApiService) WriteAssertionsExecute(r ApiWriteAssertionsRequest)
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
@@ -3985,7 +4035,7 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
 					continue
 				}
-				// maximum number of retry reached
+				// maximum number of retries reached
 				newErr := FgaApiRateLimitExceededError{
 					body: localVarBody,
 
@@ -4016,6 +4066,11 @@ func (a *Auth0FgaApiService) WriteAuthorizationModelExecute(r ApiWriteAuthorizat
 			}
 
 			if localVarHTTPResponse.StatusCode >= 500 {
+				if i < maxRetry {
+					time.Sleep(time.Duration(randomTime(i, minWaitInMs)) * time.Millisecond)
+					continue
+				}
+				// maximum number of retries reached
 				newErr := FgaApiInternalError{
 					body: localVarBody,
 
