@@ -39,15 +39,42 @@ Warning: This SDK comes with no SLAs and is not production-ready!
 
 ## About
 
-[Auth0 Fine Grained Authorization (FGA)](https://fga.dev) is Auth0's Fine-Grained Authorization at scale SaaS based on Google's Zanzibar.
+[Auth0 Fine Grained Authorization (FGA)](https://dashboard.fga.dev) is the  early-stage product we are building at Auth0 as part of [Auth0Lab](https://twitter.com/Auth0Lab/) to solve fine-grained authorization at scale.
+If you are interested in learning more about our plans, please reach out via our <a target="_blank" href="https://discord.gg/8naAwJfWN6" rel="noreferrer">Discord chat</a>.
 
-Auth0 Fine Grained Authorization (FGA) is designed to make it easy for application builders to model their permission layer, and to add and integrate fine-grained authorization into their applications. Auth0 Fine Grained Authorization (FGA)’s design is optimized for reliability and low latency at a high scale.
+We recommend using the [OpenFGA Go SDK](https://github.com/openfga/go-sdk) with the following configuration instead of this SDK:
 
-It allows in-memory data storage for quick development, as well as pluggable database modules - with initial support for PostgreSQL.
+```go
+import (
+    "os"
 
-It offers an [HTTP API](https://docs.fga.dev/api/service) and has SDKs for programming languages including [Node.js/JavaScript](https://github.com/auth0-lab/js-sdk), [GoLang](https://github.com/auth0-lab/go-sdk) and [.NET](https://github.com/auth0-lab/dotnet-sdk).
+    openfga "github.com/openfga/go-sdk"
+    . "github.com/openfga/go-sdk/client"
+    "github.com/openfga/go-sdk/credentials"
+)
 
-More SDKs and integrations such as Rego are planned for the future.
+func main() {
+    fgaClient, err := NewSdkClient(&ClientConfiguration{
+        ApiScheme:      "https",
+        ApiHost:        "api.us1.fga.dev",
+        StoreId:        os.Getenv("FGA_STORE_ID"),
+        AuthorizationModelId: openfga.PtrString(os.Getenv("FGA_MODEL_ID")),
+        Credentials: &credentials.Credentials{ // Credentials are not needed if connecting to the Playground API
+            Method: credentials.CredentialsMethodClientCredentials,
+            Config: &credentials.Config{
+                ClientCredentialsClientId:       os.Getenv("FGA_CLIENT_ID"),
+                ClientCredentialsClientSecret:   os.Getenv("FGA_CLIENT_SECRET"),
+                ClientCredentialsApiAudience:    "https://api.us1.fga.dev/",
+                ClientCredentialsApiTokenIssuer: "fga.us.auth0.com",
+            },
+        },
+    })
+
+    if err != nil {
+        // .. Handle error
+    }
+}
+```
 
 ## Resources
 
