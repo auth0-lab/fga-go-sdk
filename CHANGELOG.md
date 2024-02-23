@@ -1,5 +1,55 @@
 # Changelog
 
+## v0.7.0
+
+### [0.7.0](https://github.com/auth0-lab/fga-go-sdk/compare/v0.6.1...v0.7.0) (2024-02-23)
+
+[Breaking]
+
+As of this point this SDK is deprecated and should no longer be used. Please use https://github.com/openfga/go-sdk instead.
+
+We strongly recommend you use the [OpenFGA Go SDK](https://github.com/openfga/go-sdk) directly instead with the following configuration:
+
+For US1 (Production US) environment, use the following values:
+- API URL: `https://api.us1.fga.dev`
+- Credential Method: ClientCredentials
+- API Token Issuer: `fga.us.auth0.com`
+- API Audience: `https://api.us1.fga.dev/`
+
+You can get the rest of the necessary variables from the FGA Dashboard. See [here](https://docs.fga.dev/intro/dashboard#create-api-credentials).
+
+```go
+package main
+
+import (
+    "os"
+
+    . "github.com/openfga/go-sdk/client"
+    "github.com/openfga/go-sdk/credentials"
+)
+
+func main() {
+	fgaClient, err := NewSdkClient(&ClientConfiguration{
+        ApiUrl:         "https://api.us1.fga.dev",
+        StoreId:        os.Getenv("FGA_STORE_ID"),
+        AuthorizationModelId: os.Getenv("FGA_MODEL_ID"),
+        Credentials: &credentials.Credentials{
+            Method: credentials.CredentialsMethodClientCredentials,
+            Config: &credentials.Config{
+                ClientCredentialsClientId:       os.Getenv("FGA_CLIENT_ID"),
+                ClientCredentialsClientSecret:   os.Getenv("FGA_CLIENT_SECRET"),
+                ClientCredentialsApiAudience:    "https://api.us1.fga.dev/",
+                ClientCredentialsApiTokenIssuer: "fga.us.auth0.com",
+            },
+        },
+    })
+
+    if err != nil {
+        // .. Handle error
+    }
+}
+```
+
 ## v0.6.1
 
 ### [0.6.1](https://github.com/auth0-lab/fga-go-sdk/compare/v0.6.0...v0.6.1) (2023-03-10)
